@@ -1,0 +1,31 @@
+{
+  "name": "fx-portal",
+  "version": "1.0.0",
+  "description": "FxPortal for Matic chain. No mapping. Seamless.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jdkanani/fx-portal.git"
+  },
+  "keywords": [
+    "ethereum",
+    "matic"
+  ],
+  "author": "Jaynti Kanani <jdkanani@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jdkanani/fx-portal/issues"
+  },
+  "homepage": "https://github.com/jdkanani/fx-portal#readme",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "chai": "^4.2.0",
+    "ethereum-waffle": "^3.2.1",
+    "ethers": "^5.0.24",
+    "hardhat": "^2.0.7"
+  }
+}
