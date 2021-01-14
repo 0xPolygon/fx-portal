@@ -8,6 +8,9 @@ import { FxERC20 } from './FxERC20.sol';
  * @title FxERC20ChildTunnel
  */
 contract FxERC20ChildTunnel is FxBaseChildTunnel {
+    bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
+    bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
+    
     // event for token maping
     event TokenMapped(address indexed rootToken, address indexed childToken);
     // root to child token
@@ -19,7 +22,39 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         tokenTemplate = _tokenTemplate;
     }
 
-    function mapToken(address rootToken) public returns (address) {
+    function _processMessageFromRoot(uint256 /* stateId */, address /* sender */, bytes memory data) internal override {
+        (bytes32 syncType, bytes memory syncData) = abi.decode(data, (bytes32, bytes));
+
+        if (syncType == DEPOSIT) {
+            _syncDeposit(syncData);
+        } else if (syncType == MAP_TOKEN) {
+            _mapToken(syncData);
+        } else {
+            revert("ChildChainManager: INVALID_SYNC_TYPE");
+        }
+    }
+
+    function withdraw(address rootToken, uint256 amount) public {
+        // get root to child token
+        address childToken = rootToChildToken[rootToken];
+        require (childToken != address(0x0), "No mapped token");
+
+        // withdraw tokens
+        FxERC20 childTokenContract = FxERC20(childToken);
+        childTokenContract.withdraw(msg.sender, amount);
+
+        // send message to root regarding token burn
+        _sendMessageToRoot(abi.encode(rootToken, childToken, msg.sender, amount));
+    }
+
+    //
+    // Internal methods
+    //
+
+    function _mapToken(bytes memory syncData) internal returns (address) {
+        (address rootToken, string memory name, string memory symbol, uint8 decimals) = abi.decode(syncData, (address, string, string, uint8));
+        
+        // get root to child token
         address childToken = rootToChildToken[rootToken];
 
         // check if it's already mapped
@@ -27,7 +62,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
 
         // deploy new child token
         childToken = _createClone(rootToken, tokenTemplate);
-        FxERC20(childToken).initialize(address(this), rootToken, 18);
+        FxERC20(childToken).initialize(address(this), rootToken, name, symbol, decimals);
 
         // map the token
         rootToChildToken[rootToken] = childToken;
@@ -37,21 +72,14 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         return childToken;
     }
 
-    function _processMessageFromRoot(uint256 /* stateId */, address /* sender */, bytes memory data) internal override {
-        (address rootToken, address depositor, address user, uint256 amount, bytes memory depositData) = abi.decode(data, (address, address, address, uint256, bytes));
+    function _syncDeposit(bytes memory syncData) internal {
+        (address rootToken, address depositor, address user, uint256 amount, bytes memory depositData) = abi.decode(syncData, (address, address, address, uint256, bytes));
         address childTokenAddress = rootToChildToken[rootToken];
-        if (childTokenAddress == address(0x0)) {
-            childTokenAddress = mapToken(rootToken);
-        }
 
         // deposit tokens
         FxERC20 childTokenContract = FxERC20(childTokenAddress);
         childTokenContract.deposit(user, amount);
     }
-
-    //
-    // Internal methods
-    //
 
     function _createClone(address _rootToken, address _target) internal returns (address _result) {
         bytes20 _targetBytes = bytes20(_target);
