@@ -6,10 +6,14 @@ interface IStateSender {
     function syncState(address receiver, bytes calldata data) external;
 }
 
+interface IFxStateSender {
+    function sendMessageToChild(address _receiver, bytes calldata _data) external;
+}
+
 /** 
  * @title FxRoot root contract for fx-portal
  */
-contract FxRoot {
+contract FxRoot is IFxStateSender {
     IStateSender public stateSender;
     address public fxChild;
 
@@ -18,7 +22,7 @@ contract FxRoot {
         fxChild = _fxChild;
     }
 
-    function sendMessageToChild(address _receiver, bytes calldata _data) external {
+    function sendMessageToChild(address _receiver, bytes calldata _data) public override {
         bytes memory data = abi.encode(msg.sender, _receiver, _data);
         stateSender.syncState(fxChild, data);
     }
