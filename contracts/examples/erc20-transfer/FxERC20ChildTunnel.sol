@@ -2,7 +2,7 @@
 pragma solidity 0.7.3;
 
 import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
-import { FxERC20 } from './FxERC20.sol';
+import { IFxERC20 } from '../../tokens/IFxERC20.sol';
 
 /** 
  * @title FxERC20ChildTunnel
@@ -36,7 +36,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
     }
 
     function withdraw(address childToken, uint256 amount) public {
-        FxERC20 childTokenContract = FxERC20(childToken);
+        IFxERC20 childTokenContract = IFxERC20(childToken);
         address rootToken = childTokenContract.rootToken();
 
         // validate root and child token mapping
@@ -69,7 +69,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
 
         // deploy new child token
         childToken = _createClone(rootToken, tokenTemplate);
-        FxERC20(childToken).initialize(address(this), rootToken, string(abi.encodePacked(name, SUFFIX)), symbol, decimals);
+        IFxERC20(childToken).initialize(address(this), rootToken, string(abi.encodePacked(name, SUFFIX)), symbol, decimals);
 
         // map the token
         rootToChildToken[rootToken] = childToken;
@@ -84,7 +84,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         address childToken = rootToChildToken[rootToken];
 
         // deposit tokens
-        FxERC20 childTokenContract = FxERC20(childToken);
+        IFxERC20 childTokenContract = IFxERC20(childToken);
         childTokenContract.deposit(to, amount);
 
         // call `onTokenTranfer` on `to` with limit and ignore error
