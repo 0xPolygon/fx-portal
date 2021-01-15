@@ -67,7 +67,16 @@ contract FxERC20RootTunnel is FxBaseRootTunnel {
         _sendMessageToChild(message);
     }
 
+    // exit processor
     function _processMessageFromChild(bytes memory data) internal override {
-        // TODO process data for exit
+        (address rootToken, address childToken, address to, uint256 amount) = abi.decode(data, (address, address, address, uint256));
+        // require(rootToken == childToRootToken[childToken], "FxERC20RootTunnel: INVALID_MAPPING_FOR_EXIT"); // no need for now
+
+        // transfer from tokens to 
+        ERC20(rootToken).transferFrom(
+            address(this),
+            to,
+            amount
+        );
     }
 }

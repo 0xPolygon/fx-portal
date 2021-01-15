@@ -35,13 +35,19 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         }
     }
 
-    function withdraw(address rootToken, uint256 amount) public {
-        // get root to child token
-        address childToken = rootToChildToken[rootToken];
-        require (childToken != address(0x0), "FxERC20ChildTunnel: NO_MAPPED_TOKEN");
+    function withdraw(address childToken, uint256 amount) public {
+        FxERC20 childTokenContract = FxERC20(childToken);
+        address rootToken = childTokenContract.rootToken();
+
+        // validate root and child token mapping
+        require(
+            childToken != address(0x0) &&
+            rootToken != address(0x0) && 
+            childToken == rootToChildToken[rootToken], 
+            "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
+        );
 
         // withdraw tokens
-        FxERC20 childTokenContract = FxERC20(childToken);
         childTokenContract.withdraw(msg.sender, amount);
 
         // send message to root regarding token burn
