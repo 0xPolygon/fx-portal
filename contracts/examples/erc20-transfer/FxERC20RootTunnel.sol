@@ -12,11 +12,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
-    // event for token mapping
-    event TokenMapped(address indexed rootToken, address indexed childToken);
-
-    // token mappings
-    mapping(address => address) public childToRootToken;
+    mapping(address => bool) public mappedTokens;
 
     constructor(address _checkpointManager, address _fxRoot, address _fxChildTunnel) 
       FxBaseRootTunnel(_checkpointManager, _fxRoot, _fxChildTunnel) {}
@@ -25,30 +21,24 @@ contract FxERC20RootTunnel is FxBaseRootTunnel {
      * @notice Map a token to enable its movement via the PoS Portal, callable only by mappers
      * @param rootToken address of token on root chain
      */
-    function mapToken(address rootToken) public returns (address) {
-        // TODO generate child token from root token
-        address childToken = address(0x0);
-
+    function mapToken(address rootToken) public {
         // if token is already mapped return child token
-        if (childToRootToken[childToken] != address(0)) {
-          return childToken;
+        if (mappedTokens[rootToken] == true) {
+            return;
         }
 
         // name, symbol and decimals
-        ERC20 childTokenContract = ERC20(childToken);
-        string memory name = childTokenContract.name();
-        string memory symbol = childTokenContract.symbol();
-        uint8 decimals = childTokenContract.decimals();
+        ERC20 rootTokenContract = ERC20(rootToken);
+        string memory name = rootTokenContract.name();
+        string memory symbol = rootTokenContract.symbol();
+        uint8 decimals = rootTokenContract.decimals();
 
         // MAP_TOKEN, encode(rootToken, name, symbol, decimals)
         bytes memory message = abi.encode(MAP_TOKEN, abi.encode(rootToken, name, symbol, decimals));
         _sendMessageToChild(message);
 
-        // emit an event for token map
-        emit TokenMapped(rootToken, childToken);
-
-        // return child token
-        return childToken;
+        // add into mapped tokens
+        mappedTokens[rootToken] = true;
     }
 
     function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {
@@ -70,7 +60,6 @@ contract FxERC20RootTunnel is FxBaseRootTunnel {
     // exit processor
     function _processMessageFromChild(bytes memory data) internal override {
         (address rootToken, /* address childToken */, address to, uint256 amount) = abi.decode(data, (address, address, address, uint256));
-        // require(rootToken == childToRootToken[childToken], "FxERC20RootTunnel: INVALID_MAPPING_FOR_EXIT"); // no need for now
 
         // transfer from tokens to 
         ERC20(rootToken).transferFrom(
