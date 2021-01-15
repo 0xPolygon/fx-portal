@@ -95,7 +95,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
 
     function _createClone(address _rootToken, address _target) internal returns (address _result) {
         bytes20 _targetBytes = bytes20(_target);
-        bytes32 _salt = keccak256(abi.encodePacked(address(this), _rootToken));
+        bytes32 _salt = keccak256(abi.encode(address(this), _rootToken));
 
         assembly {
             let clone := mload(0x40)
