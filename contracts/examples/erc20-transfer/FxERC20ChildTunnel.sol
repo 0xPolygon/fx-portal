@@ -73,12 +73,23 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
     }
 
     function _syncDeposit(bytes memory syncData) internal {
-        (address rootToken, address depositor, address user, uint256 amount, bytes memory depositData) = abi.decode(syncData, (address, address, address, uint256, bytes));
-        address childTokenAddress = rootToChildToken[rootToken];
+        (address rootToken, address depositor, address to, uint256 amount, bytes memory depositData) = abi.decode(syncData, (address, address, address, uint256, bytes));
+        address childToken = rootToChildToken[rootToken];
 
         // deposit tokens
-        FxERC20 childTokenContract = FxERC20(childTokenAddress);
-        childTokenContract.deposit(user, amount);
+        FxERC20 childTokenContract = FxERC20(childToken);
+        childTokenContract.deposit(to, amount);
+
+        // call them
+        if (_isContract(to)) {
+            uint256 txGas = 2000000;
+            bool success = false;
+            bytes memory data = abi.encodeWithSignature("onTokenTransfer(address,address,address,address,uint256,bytes)", rootToken, childToken, depositor, to, amount, depositData);
+            // solium-disable-next-line security/no-inline-assembly
+            assembly {
+                success := call(txGas, to, 0, add(data, 0x20), mload(data), 0, 0)
+            }
+        }
     }
 
     function _createClone(address _rootToken, address _target) internal returns (address _result) {
@@ -92,5 +103,14 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
             mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
             _result := create2(0, clone, 0x37, _salt)
         }
+    }
+
+    // check if address is contract
+    function _isContract(address _addr) private view returns (bool){
+        uint32 size;
+        assembly {
+            size := extcodesize(_addr)
+        }
+        return (size > 0);
     }
 }

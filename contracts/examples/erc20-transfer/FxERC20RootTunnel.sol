@@ -18,9 +18,8 @@ contract FxERC20RootTunnel is FxBaseRootTunnel {
     // token mappings
     mapping(address => address) public childToRootToken;
 
-    constructor(address _checkpointManager, address _fxRoot, address _fxChildTunnel)  FxBaseRootTunnel(_checkpointManager, _fxRoot, _fxChildTunnel) {
-
-    }
+    constructor(address _checkpointManager, address _fxRoot, address _fxChildTunnel) 
+      FxBaseRootTunnel(_checkpointManager, _fxRoot, _fxChildTunnel) {}
 
     /**
      * @notice Map a token to enable its movement via the PoS Portal, callable only by mappers
