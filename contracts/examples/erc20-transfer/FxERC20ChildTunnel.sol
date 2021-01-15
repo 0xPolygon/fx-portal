@@ -10,6 +10,7 @@ import { FxERC20 } from './FxERC20.sol';
 contract FxERC20ChildTunnel is FxBaseChildTunnel {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
+    string public constant SUFFIX = " (FXERC20)";
     
     // event for token maping
     event TokenMapped(address indexed rootToken, address indexed childToken);
@@ -30,14 +31,14 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         } else if (syncType == MAP_TOKEN) {
             _mapToken(syncData);
         } else {
-            revert("ChildChainManager: INVALID_SYNC_TYPE");
+            revert("FxERC20ChildTunnel: INVALID_SYNC_TYPE");
         }
     }
 
     function withdraw(address rootToken, uint256 amount) public {
         // get root to child token
         address childToken = rootToChildToken[rootToken];
-        require (childToken != address(0x0), "No mapped token");
+        require (childToken != address(0x0), "FxERC20ChildTunnel: NO_MAPPED_TOKEN");
 
         // withdraw tokens
         FxERC20 childTokenContract = FxERC20(childToken);
@@ -58,11 +59,11 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         address childToken = rootToChildToken[rootToken];
 
         // check if it's already mapped
-        require(childToken == address(0x0), "Token is already mapped");
+        require(childToken == address(0x0), "FxERC20ChildTunnel: ALREADY_MAPPED");
 
         // deploy new child token
         childToken = _createClone(rootToken, tokenTemplate);
-        FxERC20(childToken).initialize(address(this), rootToken, name, symbol, decimals);
+        FxERC20(childToken).initialize(address(this), rootToken, string(abi.encodePacked(name, SUFFIX)), symbol, decimals);
 
         // map the token
         rootToChildToken[rootToken] = childToken;
@@ -80,7 +81,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         FxERC20 childTokenContract = FxERC20(childToken);
         childTokenContract.deposit(to, amount);
 
-        // call them
+        // call `onTokenTranfer` on `to` with limit and ignore error
         if (_isContract(to)) {
             uint256 txGas = 2000000;
             bool success = false;
