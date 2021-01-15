@@ -13,7 +13,7 @@ contract FxERC20 is IFxERC20, ERC20 {
     address private _rootToken;
 
     function initialize(address fxManager_, address rootToken_, string memory name_, string memory symbol_, uint8 decimals_) public override {
-        require(fxManager_ == address(0x0) && rootToken_ == address(0x0), "Token is already initialized");
+        require(_fxManager == address(0x0) && _rootToken == address(0x0), "Token is already initialized");
         _fxManager = fxManager_;
         _rootToken = rootToken_;
 
