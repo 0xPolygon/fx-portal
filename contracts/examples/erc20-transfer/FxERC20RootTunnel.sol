@@ -22,10 +22,8 @@ contract FxERC20RootTunnel is FxBaseRootTunnel {
      * @param rootToken address of token on root chain
      */
     function mapToken(address rootToken) public {
-        // if token is already mapped return child token
-        if (mappedTokens[rootToken] == true) {
-            return;
-        }
+        // check if token is already mapped
+        require(mappedTokens[rootToken] == false);
 
         // name, symbol and decimals
         ERC20 rootTokenContract = ERC20(rootToken);
@@ -43,7 +41,9 @@ contract FxERC20RootTunnel is FxBaseRootTunnel {
 
     function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {
         // map token if not mapped
-        mapToken(rootToken);
+        if (mappedTokens[rootToken] == false) {
+            mapToken(rootToken);
+        }
 
         // transfer from depositor to this contract
         ERC20(rootToken).transferFrom(
