@@ -45,9 +45,14 @@ abstract contract FxBaseRootTunnel {
     // storage to avoid duplicate exits
     mapping(bytes32 => bool) public processedExits;
 
-    constructor(address _checkpointManager, address _fxRoot, address _fxChildTunnel) {
+    constructor(address _checkpointManager, address _fxRoot) {
         checkpointManager = ICheckpointManager(_checkpointManager);
         fxRoot = IFxStateSender(_fxRoot);
+    }
+
+    // set fxChildTunnel if not set already
+    function setFxChildTunnel(address _fxChildTunnel) public {
+        require(fxChildTunnel == address(0x0), "FxBaseRootTunnel: CHILD_TUNNEL_ALREADY_SET");
         fxChildTunnel = _fxChildTunnel;
     }
 

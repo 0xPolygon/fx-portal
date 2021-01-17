@@ -9,9 +9,7 @@ import { FxBaseRootTunnel } from '../../tunnel/FxBaseRootTunnel.sol';
 contract FxStateRootTunnel is FxBaseRootTunnel {
     bytes public latestData;
 
-    constructor(address _checkpointManager, address _fxRoot, address _fxChildTunnel)  FxBaseRootTunnel(_checkpointManager, _fxRoot, _fxChildTunnel) {
-
-    }
+    constructor(address _checkpointManager, address _fxRoot)  FxBaseRootTunnel(_checkpointManager, _fxRoot) {}
 
     function _processMessageFromChild(bytes memory data) internal override {
         latestData = data;

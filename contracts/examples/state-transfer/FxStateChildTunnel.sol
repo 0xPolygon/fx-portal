@@ -15,7 +15,11 @@ contract FxStateChildTunnel is FxBaseChildTunnel {
 
     }
 
-    function _processMessageFromRoot(uint256 stateId, address sender, bytes memory data) internal override {
+    function _processMessageFromRoot(uint256 stateId, address sender, bytes memory data)
+        internal
+        override
+        validateSender(sender) {
+
         latestStateId = stateId;
         latestRootMessageSender = sender;
         latestData = data;

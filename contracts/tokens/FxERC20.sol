@@ -10,12 +10,12 @@ import { IFxERC20 } from "./IFxERC20.sol";
  */
 contract FxERC20 is IFxERC20, ERC20 {
     address internal _fxManager;
-    address internal _rootToken;
+    address internal _connectedToken;
 
-    function initialize(address fxManager_, address rootToken_, string memory name_, string memory symbol_, uint8 decimals_) public override {
-        require(_fxManager == address(0x0) && _rootToken == address(0x0), "Token is already initialized");
+    function initialize(address fxManager_, address connectedToken_, string memory name_, string memory symbol_, uint8 decimals_) public override {
+        require(_fxManager == address(0x0) && _connectedToken == address(0x0), "Token is already initialized");
         _fxManager = fxManager_;
-        _rootToken = rootToken_;
+        _connectedToken = connectedToken_;
 
         // setup meta data
         setupMetaData(name_, symbol_, decimals_);
@@ -26,9 +26,9 @@ contract FxERC20 is IFxERC20, ERC20 {
       return _fxManager;
     }
 
-    // rootToken returns root token
-    function rootToken() public override view returns (address) {
-      return _rootToken;
+    // connectedToken returns root token
+    function connectedToken() public override view returns (address) {
+      return _connectedToken;
     }
 
     // setup name, symbol and decimals
@@ -37,12 +37,12 @@ contract FxERC20 is IFxERC20, ERC20 {
         _setupMetaData(_name, _symbol, _decimals);
     }
 
-    function deposit(address user, uint256 amount) public override {
+    function mint(address user, uint256 amount) public override {
         require(msg.sender == _fxManager, "Invalid sender");
         _mint(user, amount);
     }
 
-    function withdraw(address user, uint256 amount) public override {
+    function burn(address user, uint256 amount) public override {
         require(msg.sender == _fxManager, "Invalid sender");
         _burn(user, amount);
     }

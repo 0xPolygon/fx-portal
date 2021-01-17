@@ -26,7 +26,12 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         require(_isContract(_tokenTemplate), "Token template is not contract");
     }
 
-    function _processMessageFromRoot(uint256 /* stateId */, address /* sender */, bytes memory data) internal override {
+    function _processMessageFromRoot(uint256 /* stateId */, address sender, bytes memory data)
+        internal
+        override
+        validateSender(sender) {
+
+        // decode incoming data
         (bytes32 syncType, bytes memory syncData) = abi.decode(data, (bytes32, bytes));
 
         if (syncType == DEPOSIT) {
@@ -40,7 +45,8 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
 
     function withdraw(address childToken, uint256 amount) public {
         IFxERC20 childTokenContract = IFxERC20(childToken);
-        address rootToken = childTokenContract.rootToken();
+        // child token contract will have root token
+        address rootToken = childTokenContract.connectedToken();
 
         // validate root and child token mapping
         require(
@@ -51,7 +57,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         );
 
         // withdraw tokens
-        childTokenContract.withdraw(msg.sender, amount);
+        childTokenContract.burn(msg.sender, amount);
 
         // send message to root regarding token burn
         _sendMessageToRoot(abi.encode(rootToken, childToken, msg.sender, amount));
@@ -89,7 +95,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
 
         // deposit tokens
         IFxERC20 childTokenContract = IFxERC20(childToken);
-        childTokenContract.deposit(to, amount);
+        childTokenContract.mint(to, amount);
 
         // call `onTokenTranfer` on `to` with limit and ignore error
         if (_isContract(to)) {
