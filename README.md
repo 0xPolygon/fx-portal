@@ -7,8 +7,6 @@ FxPortal for Matic chain. No mapping. Seamless.
 
 `FxChild` and `FxRoot` are main contracts on which mapping-less bridge works. It calls and passes data to user-defined methods on another chain without mapping.
 
-I have already deployed both contracts:
-
 **Mumbai**
 
 | Contract | Deployed address  |
