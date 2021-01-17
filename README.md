@@ -2,23 +2,24 @@
 
 FxPortal for Matic chain. No mapping. Seamless.
 
-### Warning: Under heavy development. Code is not audited.
+### Warning: Under heavy development. This code is not audited.
 
 ### What is Fx bridge (fx-portal)?
 
-It's Meta bridge. This bridge allows any type of state sync without mapping.
+It's Meta bridge. This bridge allows any state-syncs without mapping.
 
 **What about PoS portal?**
 
-PoS Portal is another bridge but it works only for few ERC standards and requires mappings. It is more developer friendly, allows customization without much headache. 
+PoS Portal is another bridge, but it works only for few ERC standards and requires mappings. It is more developer-friendly, allows customization without much headache. 
 
-While Fx-portal focuses on permissionless-ness and flexibility. A deverloper might have to write more code but more customizatable than PoS Portal. Requires no mapping.
+While Fx-portal focuses on permissionless-ness and flexibility, a developer might have to write more code but more customizable than PoS Portal. It requires no mapping.
 
-**Can I built my own bridge?**
+**Can I built my bridge?**
 
-Yes. You can check docs here: https://docs.matic.network/docs/develop/l1-l2-communication/ethereum-to-matic and https://docs.matic.network/docs/develop/l1-l2-communication/matic-to-ethereum 
+Yes. You can check docs here: https://docs.matic.network/docs/develop/l1-l2-communication/ethereum-to-matic
+https://docs.matic.network/docs/develop/l1-l2-communication/matic-to-ethereum 
 
-### What is FxChild and FxRoot?
+### What are FxChild and FxRoot?
 
 `FxChild` (FxChild.sol)  and `FxRoot` (FxRoot.sol) are main contracts on which mapping-less bridge works. It calls and passes data to user-defined methods on another chain without mapping.
 
@@ -38,7 +39,7 @@ Yes. You can check docs here: https://docs.matic.network/docs/develop/l1-l2-comm
 | [FxChild (Matic Mainnnet)](https://explorer-mainnet.maticvigil.com/address/0x8397259c983751DAf40400790063935a11afa28a/contracts) | `0x8397259c983751DAf40400790063935a11afa28a`|
 
 
-You can deploy your own `FxChild` and `FxRoot`. But no need, except you just want to have some fun and extra ETH to throw away.
+You can deploy your own `FxChild` and `FxRoot`, but no need. Except you want to have some fun and have extra ETH to throw away.
 
 ### What can I build with it?
 
