@@ -1,7 +1,8 @@
 # fx-portal
+
 FxPortal for Matic chain. No mapping. Seamless.
 
-**Warning:** Code is not audited.
+### Warning: Under heavy development. Code is not audited.
 
 ### What is Fx bridge (fx-portal)?
 
