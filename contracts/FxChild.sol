@@ -8,7 +8,7 @@ interface IStateReceiver {
 
 // IFxMessageProcessor represents interface to process message
 interface IFxMessageProcessor {
-    function onMessageReceive(uint256 stateId, address rootMessageSender, bytes calldata data) external;
+    function processMessageFromRoot(uint256 stateId, address rootMessageSender, bytes calldata data) external;
 }
 
 /**
@@ -21,6 +21,6 @@ contract FxChild is IStateReceiver {
         require(msg.sender == address(0x0000000000000000000000000000000000001001), "Invalid sender");
         (address rootMessageSender, address receiver, bytes memory data) = abi.decode(_data, (address, address, bytes));
         emit NewFxMessage(rootMessageSender, receiver, data);
-        IFxMessageProcessor(receiver).onMessageReceive(stateId, rootMessageSender, data);
+        IFxMessageProcessor(receiver).processMessageFromRoot(stateId, rootMessageSender, data);
     }
 }

@@ -3,7 +3,7 @@ pragma solidity 0.7.3;
 
 // IFxMessageProcessor represents interface to process message
 interface IFxMessageProcessor {
-    function onMessageReceive(uint256 stateId, address rootMessageSender, bytes calldata data) external;
+    function processMessageFromRoot(uint256 stateId, address rootMessageSender, bytes calldata data) external;
 }
 
 /**
@@ -35,8 +35,8 @@ abstract contract FxBaseChildTunnel is IFxMessageProcessor{
         fxRootTunnel = _fxRootTunnel;
     }
 
-    function onMessageReceive(uint256 stateId, address rootMessageSender, bytes calldata data) public override {
-        require(msg.sender == fxChild, "Invalid sender");
+    function processMessageFromRoot(uint256 stateId, address rootMessageSender, bytes calldata data) public override {
+        require(msg.sender == fxChild, "FxBaseChildTunnel: INVALID_SENDER");
         _processMessageFromRoot(stateId, rootMessageSender, data);
     }
 
