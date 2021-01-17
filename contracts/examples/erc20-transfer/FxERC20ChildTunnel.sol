@@ -26,23 +26,6 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         require(_isContract(_tokenTemplate), "Token template is not contract");
     }
 
-    function _processMessageFromRoot(uint256 /* stateId */, address sender, bytes memory data)
-        internal
-        override
-        validateSender(sender) {
-
-        // decode incoming data
-        (bytes32 syncType, bytes memory syncData) = abi.decode(data, (bytes32, bytes));
-
-        if (syncType == DEPOSIT) {
-            _syncDeposit(syncData);
-        } else if (syncType == MAP_TOKEN) {
-            _mapToken(syncData);
-        } else {
-            revert("FxERC20ChildTunnel: INVALID_SYNC_TYPE");
-        }
-    }
-
     function withdraw(address childToken, uint256 amount) public {
         IFxERC20 childTokenContract = IFxERC20(childToken);
         // child token contract will have root token
@@ -66,6 +49,23 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     //
     // Internal methods
     //
+
+    function _processMessageFromRoot(uint256 /* stateId */, address sender, bytes memory data)
+        internal
+        override
+        validateSender(sender) {
+
+        // decode incoming data
+        (bytes32 syncType, bytes memory syncData) = abi.decode(data, (bytes32, bytes));
+
+        if (syncType == DEPOSIT) {
+            _syncDeposit(syncData);
+        } else if (syncType == MAP_TOKEN) {
+            _mapToken(syncData);
+        } else {
+            revert("FxERC20ChildTunnel: INVALID_SYNC_TYPE");
+        }
+    }
 
     function _mapToken(bytes memory syncData) internal returns (address) {
         (address rootToken, string memory name, string memory symbol, uint8 decimals) = abi.decode(syncData, (address, string, string, uint8));
