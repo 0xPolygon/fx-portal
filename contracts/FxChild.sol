@@ -15,7 +15,14 @@ interface IFxMessageProcessor {
  * @title FxChild child contract for state receiver
  */
 contract FxChild is IStateReceiver {
+    address public fxRoot;
+
     event NewFxMessage(address rootMessageSender, address receiver, bytes data);
+
+    function setFxRoot(address _fxRoot) public {
+        require(fxRoot == address(0x0));
+        fxRoot = _fxRoot;
+    }
 
     function onStateReceive(uint256 stateId, bytes calldata _data) external override {
         require(msg.sender == address(0x0000000000000000000000000000000000001001), "Invalid sender");

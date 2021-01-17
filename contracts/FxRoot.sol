@@ -17,8 +17,12 @@ contract FxRoot is IFxStateSender {
     IStateSender public stateSender;
     address public fxChild;
 
-    constructor(address _stateSender, address _fxChild) {
+    constructor(address _stateSender) {
         stateSender = IStateSender(_stateSender);
+    }
+
+    function setFxChild(address _fxChild) public {
+        require(fxChild == address(0x0));
         fxChild = _fxChild;
     }
 
