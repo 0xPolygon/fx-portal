@@ -2,15 +2,17 @@
 pragma solidity 0.7.3;
 
 import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
+import { Create2 } from '../../lib/Create2.sol';
 import { IFxERC20 } from '../../tokens/IFxERC20.sol';
 
 /** 
  * @title FxERC20ChildTunnel
  */
-contract FxERC20ChildTunnel is FxBaseChildTunnel {
+contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
-    string public constant SUFFIX = " (FXERC20)";
+    string public constant SUFFIX_NAME = " (FXERC20)";
+    string public constant PREFIX_SYMBOL = "fx";
     
     // event for token maping
     event TokenMapped(address indexed rootToken, address indexed childToken);
@@ -21,6 +23,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
 
     constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
         tokenTemplate = _tokenTemplate;
+        require(_isContract(_tokenTemplate), "Token template is not contract");
     }
 
     function _processMessageFromRoot(uint256 /* stateId */, address /* sender */, bytes memory data) internal override {
@@ -68,8 +71,9 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
         require(childToken == address(0x0), "FxERC20ChildTunnel: ALREADY_MAPPED");
 
         // deploy new child token
-        childToken = _createClone(rootToken, tokenTemplate);
-        IFxERC20(childToken).initialize(address(this), rootToken, string(abi.encodePacked(name, SUFFIX)), symbol, decimals);
+        bytes32 salt = keccak256(abi.encodePacked(rootToken));
+        childToken = createClone(salt, tokenTemplate);
+        IFxERC20(childToken).initialize(address(this), rootToken, string(abi.encodePacked(name, SUFFIX_NAME)), string(abi.encodePacked(PREFIX_SYMBOL, symbol)), decimals);
 
         // map the token
         rootToChildToken[rootToken] = childToken;
@@ -96,19 +100,6 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel {
             assembly {
                 success := call(txGas, to, 0, add(data, 0x20), mload(data), 0, 0)
             }
-        }
-    }
-
-    function _createClone(address _rootToken, address _target) internal returns (address _result) {
-        bytes20 _targetBytes = bytes20(_target);
-        bytes32 _salt = keccak256(abi.encode(address(this), _rootToken));
-
-        assembly {
-            let clone := mload(0x40)
-            mstore(clone, 0x3d602d80600a3d3981f3363d3d373d3d3d363d73000000000000000000000000)
-            mstore(add(clone, 0x14), _targetBytes)
-            mstore(add(clone, 0x28), 0x5af43d82803e903d91602b57fd5bf30000000000000000000000000000000000)
-            _result := create2(0, clone, 0x37, _salt)
         }
     }
 

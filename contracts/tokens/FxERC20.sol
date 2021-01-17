@@ -9,8 +9,8 @@ import { IFxERC20 } from "./IFxERC20.sol";
  * @title FxERC20 represents fx erc20
  */
 contract FxERC20 is IFxERC20, ERC20 {
-    address private _fxManager;
-    address private _rootToken;
+    address internal _fxManager;
+    address internal _rootToken;
 
     function initialize(address fxManager_, address rootToken_, string memory name_, string memory symbol_, uint8 decimals_) public override {
         require(_fxManager == address(0x0) && _rootToken == address(0x0), "Token is already initialized");
