@@ -14,7 +14,7 @@ PoS Portal is another bridge, but it works only for few ERC standards and requir
 
 While Fx-portal focuses on permissionless-ness and flexibility, a developer might have to write more code but more customizable than PoS Portal. It requires no mapping.
 
-**Can I built my bridge?**
+**Can I build my bridge?**
 
 Yes. You can check docs here: https://docs.matic.network/docs/develop/l1-l2-communication/ethereum-to-matic
 https://docs.matic.network/docs/develop/l1-l2-communication/matic-to-ethereum 
@@ -46,4 +46,3 @@ You can deploy your own `FxChild` and `FxRoot`, but no need. Except you want to 
 * Arbitrary state bridge (examples/state-transfer)
 * Normal ERC20 bridge (examples/erc2-transfer)
 * ERC20 token generator bridge (example/mintable-erc20-transfer)
-
