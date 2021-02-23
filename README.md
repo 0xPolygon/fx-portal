@@ -2,17 +2,17 @@
 
 FxPortal for Polygon(prev Matic)Chain. No mapping. Seamless communication with Ethereum Network.
 
-### Recommendation: 
-Fx Portal is a powerful yet simple implementation of Polygon [state sync](https://docs.matic.network/docs/contribute/state-sync) mechanism (Polygon PoS bridge is based on it). The code below is an example of the usage of this cool methodology. You can use these examples to build your own implementations or own custom bridge.
+### What is Fx bridge (fx-portal)?
+
+**It is a powerful yet simple implementation Polygon [state sync](https://docs.matic.network/docs/contribute/state-sync) mechanism. Polygon PoS bridge is based on it. The code in the `examples` folder are examples of the usage of this methodology. You can use these examples to build your own implementations or own custom bridge.**
+
+In short, it's Meta bridge. This bridge allows any state-syncs without mapping.
 
 #### Some use-cases of Fx-portal
+
 * [ERC20 token tranfer from Ethereum to Matic-Chain without mapping request](https://github.com/jdkanani/fx-portal/tree/main/contracts/examples/erc20-transfer)
 * [Lazy minting of ERC20 tokens on MaticChain](https://github.com/jdkanani/fx-portal/tree/main/contracts/examples/mintable-erc20-transfer)
 * [State Transfer between Ethereum-Matic](https://github.com/jdkanani/fx-portal/tree/main/contracts/examples/state-transfer)
-
-### What is Fx bridge (fx-portal)?
-
-It's Meta bridge. This bridge allows any state-syncs without mapping.
 
 **What about [PoS portal](https://docs.matic.network/docs/develop/ethereum-matic/pos/getting-started)?**
 
