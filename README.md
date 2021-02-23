@@ -4,9 +4,9 @@ FxPortal for Polygon (previously Matic) chain. No mapping. Seamless.
 
 ### What is Fx bridge (fx-portal)?
 
-It's Meta bridge. This bridge allows any state-syncs without mapping.
+**It is a powerful yet simple implementation Polygon state sync mechanism. Polygon PoS bridge is based on it. The code in the `examples` folder are examples of the usage of this methodology. You can use these examples to build your own implementations or own custom bridge.**
 
-**It's is a powerful yet simple implementation Polygon state sync mechanism. Polygon PoS bridge is based on it. The code in the `examples` folder are examples of the usage of this methodology. You can use these examples to build your own implementations or own custom bridge.**
+In short, it's Meta bridge. This bridge allows any state-syncs without mapping.
 
 **What about PoS portal?**
 
