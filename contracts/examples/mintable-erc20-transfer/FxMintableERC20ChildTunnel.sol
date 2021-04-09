@@ -6,7 +6,7 @@ import { Create2 } from '../../lib/Create2.sol';
 import { Ownable } from '../../lib/Ownable.sol';
 import { FxERC20 } from '../../tokens/FxERC20.sol';
 
-/** 
+/**
  * @title FxMintableERC20ChildTunnel
  */
 contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
@@ -55,8 +55,8 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         // validate root and child token mapping
         require(
             childToken != address(0x0) &&
-            rootToken != address(0x0) && 
-            childToken == rootToChildToken[rootToken], 
+            rootToken != address(0x0) &&
+            childToken == rootToChildToken[rootToken],
             "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
         );
 
