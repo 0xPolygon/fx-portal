@@ -37,19 +37,19 @@ contract FxERC721 is IFxERC721, ERC721 {
         _setupMetaData(_name, _symbol);
     }
 
-    function safeMint(address user, uint256 tokenId) public override {
+    function transfer(address from, address to, uint256 tokenId) public override {
         require(msg.sender == _fxManager, "Invalid sender");
-        _safeMint(user, tokenId);
-    }
-
-    function safeMint(address user, uint256 tokenId, bytes memory _data) public override {
-        require(msg.sender == _fxManager, "Invalid sender");
-        _safeMint(user, tokenId, _data);
+        _safeTransfer(from, to, tokenId, "");
     }
 
     function mint(address user, uint256 tokenId) public override {
         require(msg.sender == _fxManager, "Invalid sender");
-        _mint(user, tokenId);
+        _safeMint(user, tokenId);
+    }
+
+    function mint(address user, uint256 tokenId, bytes memory _data) public override {
+        require(msg.sender == _fxManager, "Invalid sender");
+        _safeMint(user, tokenId, _data);
     }
 
     function burn(uint256 tokenId) public override {
