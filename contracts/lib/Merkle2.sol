@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
-library Merkle {
+library Merkle2 {
     function checkMembership(
         bytes32 leaf,
         uint256 index,
