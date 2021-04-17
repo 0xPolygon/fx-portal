@@ -109,6 +109,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
         );
 
         _approve(to, tokenId);
+        emit Approval(owner, to, tokenId);
     }
 
     /**
@@ -300,6 +301,7 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
 
         // Clear approvals from the previous owner
         _approve(address(0), tokenId);
+        emit Approval(ERC721.ownerOf(tokenId), address(0), tokenId);
 
         _balances[from] -= 1;
         _balances[to] += 1;
@@ -311,11 +313,9 @@ contract ERC721 is Context, ERC165, IERC721, IERC721Metadata {
     /**
      * @dev Approve `to` to operate on `tokenId`
      *
-     * Emits a {Approval} event.
      */
     function _approve(address to, uint256 tokenId) internal virtual {
         _tokenApprovals[tokenId] = to;
-        emit Approval(ERC721.ownerOf(tokenId), to, tokenId);
     }
 
     function _setupMetaData(string memory name_, string memory symbol_) internal virtual {

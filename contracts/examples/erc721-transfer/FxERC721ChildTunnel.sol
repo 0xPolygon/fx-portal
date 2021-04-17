@@ -47,7 +47,6 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel2, Create2v2, IERC721Receiver {
         );
 
         // withdraw tokens
-        childTokenContract.transfer(msg.sender, address(this), tokenId);
         childTokenContract.burn(tokenId);
 
         // send message to root regarding token burn
