@@ -1,23 +1,31 @@
-# fx-portal
-FxPortal for Matic chain. No mapping. Seamless.
+# fx-portal(Flexible portal)
 
-**Warning:** Code is not audited.
+FxPortal for Polygon(prev Matic)Chain. No mapping. Seamless communication with Ethereum Network.
 
 ### What is Fx bridge (fx-portal)?
 
-It's Meta bridge. This bridge allows any type of state sync without mapping.
+**It is a powerful yet simple implementation Polygon [state sync](https://docs.matic.network/docs/contribute/state-sync) mechanism. Polygon PoS bridge is based on it. The code in the `examples` folder are examples of the usage of this methodology. You can use these examples to build your own implementations or own custom bridge.**
 
-**What about PoS portal?**
+In short, it's Meta bridge. This bridge allows any state-syncs without mapping.
 
-PoS Portal is another bridge but it works only for few ERC standards and requires mappings. It is more developer friendly, allows customization without much headache. 
+#### Some use-cases of Fx-portal
 
-While Fx-portal focuses on permissionless-ness and flexibility. A deverloper might have to write more code but more customizatable than PoS Portal. Requires no mapping.
+* [ERC20 token tranfer from Ethereum to Matic-Chain without mapping request](https://github.com/jdkanani/fx-portal/tree/main/contracts/examples/erc20-transfer)
+* [Lazy minting of ERC20 tokens on MaticChain](https://github.com/jdkanani/fx-portal/tree/main/contracts/examples/mintable-erc20-transfer)
+* [State Transfer between Ethereum-Matic](https://github.com/jdkanani/fx-portal/tree/main/contracts/examples/state-transfer)
 
-**Can I built my own bridge?**
+**What about [PoS portal](https://docs.matic.network/docs/develop/ethereum-matic/pos/getting-started)?**
 
-Yes. You can check docs here: https://docs.matic.network/docs/develop/l1-l2-communication/ethereum-to-matic and https://docs.matic.network/docs/develop/l1-l2-communication/matic-to-ethereum 
+PoS Portal is another bridge, but it works only for few ERC standards and requires mappings. It is more developer-friendly, allows customization without much headache. 
 
-### What is FxChild and FxRoot?
+While Fx-portal focuses on permissionless-ness and flexibility, a developer might have to write more code but more customizable than PoS Portal. It requires no mapping.
+
+**Can I build my bridge?**
+
+Yes. You can check docs here: https://docs.matic.network/docs/develop/l1-l2-communication/ethereum-to-matic
+https://docs.matic.network/docs/develop/l1-l2-communication/matic-to-ethereum 
+
+### What are FxChild and FxRoot?
 
 `FxChild` (FxChild.sol)  and `FxRoot` (FxRoot.sol) are main contracts on which mapping-less bridge works. It calls and passes data to user-defined methods on another chain without mapping.
 
@@ -37,11 +45,10 @@ Yes. You can check docs here: https://docs.matic.network/docs/develop/l1-l2-comm
 | [FxChild (Matic Mainnnet)](https://explorer-mainnet.maticvigil.com/address/0x8397259c983751DAf40400790063935a11afa28a/contracts) | `0x8397259c983751DAf40400790063935a11afa28a`|
 
 
-You can deploy your own `FxChild` and `FxRoot`. But no need, except you just want to have some fun and extra ETH to throw away.
+You can deploy your own `FxChild` and `FxRoot`, but no need. Except you want to have some fun and have extra ETH to throw away.
 
 ### What can I build with it?
 
 * Arbitrary state bridge (examples/state-transfer)
 * Normal ERC20 bridge (examples/erc2-transfer)
 * ERC20 token generator bridge (example/mintable-erc20-transfer)
-
