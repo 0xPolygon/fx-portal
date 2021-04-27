@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.7.3;
 
 import { ERC721 } from "../../lib/ERC721.sol";
-import { Create2v2 } from "../../lib/Create2v2.sol";
-import { FxBaseRootTunnel2 } from "../../tunnel/FxBaseRootTunnel2.sol";
+import { Create2 } from "../../lib/Create2.sol";
+import { FxBaseRootTunnel } from "../../tunnel/FxBaseRootTunnel.sol";
 import { IERC721Receiver } from "../../lib/IERC721Receiver.sol";
 
 /**
  * @title FxERC721RootTunnel
  */
-contract FxERC721RootTunnel is FxBaseRootTunnel2, Create2v2, IERC721Receiver {
+contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     // maybe DEPOSIT and MAP_TOKEN can be reduced to bytes4
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
@@ -18,7 +18,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel2, Create2v2, IERC721Receiver {
     bytes32 public childTokenTemplateCodeHash;
 
     constructor(address _checkpointManager, address _fxRoot, address _fxERC721Token)
-    FxBaseRootTunnel2(_checkpointManager, _fxRoot) {
+    FxBaseRootTunnel(_checkpointManager, _fxRoot) {
         // compute child token template code hash
         childTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_fxERC721Token));
     }
@@ -64,7 +64,8 @@ contract FxERC721RootTunnel is FxBaseRootTunnel2, Create2v2, IERC721Receiver {
         ERC721(rootToken).safeTransferFrom(
             msg.sender,    // depositor
             address(this), // manager contract
-            tokenId
+            tokenId,
+            data
         );
 
         // DEPOSIT, encode(rootToken, depositor, user, tokenId, extra data)
@@ -74,7 +75,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel2, Create2v2, IERC721Receiver {
 
     // exit processor
     function _processMessageFromChild(bytes memory data) internal override {
-        (address rootToken, address childToken, address to, uint256 tokenId) = abi.decode(data, (address, address, address, uint256));
+        (address rootToken, address childToken, address to, uint256 tokenId, bytes memory syncData) = abi.decode(data, (address, address, address, uint256, bytes));
         // validate mapping for root to child
         require(rootToChildTokens[rootToken] == childToken, "FxERC721RootTunnel: INVALID_MAPPING_ON_EXIT");
 
@@ -82,7 +83,8 @@ contract FxERC721RootTunnel is FxBaseRootTunnel2, Create2v2, IERC721Receiver {
         ERC721(rootToken).safeTransferFrom(
             address(this),
             to,
-            tokenId
+            tokenId, 
+            syncData
         );
     }
 }

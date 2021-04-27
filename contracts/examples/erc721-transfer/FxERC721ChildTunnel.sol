@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity 0.7.3;
 
-import { FxBaseChildTunnel2 } from '../../tunnel/FxBaseChildTunnel2.sol';
-import { Create2v2 } from '../../lib/Create2v2.sol';
+import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
+import { Create2 } from '../../lib/Create2.sol';
 import { IFxERC721 } from '../../tokens/IFxERC721.sol';
 import { IERC721Receiver } from "../../lib/IERC721Receiver.sol";
 
 /**
  * @title FxERC721ChildTunnel
  */
-contract FxERC721ChildTunnel is FxBaseChildTunnel2, Create2v2, IERC721Receiver {
+contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
     string public constant SUFFIX_NAME = " (FXERC721)";
@@ -22,7 +22,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel2, Create2v2, IERC721Receiver {
     // token template
     address public tokenTemplate;
 
-    constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel2(_fxChild) {
+    constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
         tokenTemplate = _tokenTemplate;
         require(_isContract(_tokenTemplate), "Token template is not contract");
     }
@@ -33,7 +33,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel2, Create2v2, IERC721Receiver {
         return this.onERC721Received.selector;
     }
 
-    function withdraw(address childToken, uint256 tokenId) public {
+    function withdraw(address childToken, uint256 tokenId, bytes memory data) public {
         IFxERC721 childTokenContract = IFxERC721(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
@@ -50,7 +50,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel2, Create2v2, IERC721Receiver {
         childTokenContract.burn(tokenId);
 
         // send message to root regarding token burn
-        _sendMessageToRoot(abi.encode(rootToken, childToken, msg.sender, tokenId));
+        _sendMessageToRoot(abi.encode(rootToken, childToken, msg.sender, tokenId, data));
     }
 
     //
