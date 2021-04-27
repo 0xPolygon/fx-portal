@@ -5,7 +5,7 @@ import { ERC20 } from "../../lib/ERC20.sol";
 import { Create2 } from "../../lib/Create2.sol";
 import { FxBaseRootTunnel } from "../../tunnel/FxBaseRootTunnel.sol";
 
-/** 
+/**
  * @title FxERC20RootTunnel
  */
 contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
@@ -71,9 +71,8 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
         // validate mapping for root to child
         require(rootToChildTokens[rootToken] == childToken, "FxERC20RootTunnel: INVALID_MAPPING_ON_EXIT");
 
-        // transfer from tokens to 
-        ERC20(rootToken).transferFrom(
-            address(this),
+        // transfer from tokens to
+        ERC20(rootToken).transfer(
             to,
             amount
         );
