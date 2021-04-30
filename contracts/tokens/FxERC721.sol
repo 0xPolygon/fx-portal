@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3
+pragma solidity 0.7.3;
 
 import { ERC721 } from "../lib/ERC721.sol";
 import { IFxERC721 } from "./IFxERC721.sol";
@@ -21,7 +21,7 @@ contract FxERC721 is IFxERC721, ERC721 {
         setupMetaData(name_, symbol_);
     }
 
-    // fxManager rturns fx manager
+    // fxManager returns fx manager
     function fxManager() public override view returns (address) {
       return _fxManager;
     }
@@ -35,16 +35,6 @@ contract FxERC721 is IFxERC721, ERC721 {
     function setupMetaData(string memory _name, string memory _symbol) public {
         require(msg.sender == _fxManager, "Invalid sender");
         _setupMetaData(_name, _symbol);
-    }
-
-    function transfer(address from, address to, uint256 tokenId) public override {
-        require(msg.sender == _fxManager, "Invalid sender");
-        _safeTransfer(from, to, tokenId, "");
-    }
-
-    function mint(address user, uint256 tokenId) public override {
-        require(msg.sender == _fxManager, "Invalid sender");
-        _safeMint(user, tokenId);
     }
 
     function mint(address user, uint256 tokenId, bytes memory _data) public override {
