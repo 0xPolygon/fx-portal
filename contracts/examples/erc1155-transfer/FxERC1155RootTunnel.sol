@@ -13,6 +13,8 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
     bytes32 public constant WITHDRAW_BATCH = keccak256("WITHDRAW_BATCH");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
     
+    event TokenMapped(address indexed rootToken, address indexed childToken);
+
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
     
@@ -36,6 +38,7 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
+         emit TokenMapped(rootToken, childToken);
     }
     
     function deposit(address rootToken, address user, uint256 id, uint256 amount, bytes memory data) public {
@@ -82,11 +85,11 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
         (bytes32 syncType, bytes memory syncData) = abi.decode(data, (bytes32, bytes));
         
         if(syncType == WITHDRAW) {
-            _syncTransfer(syncData);
+            _syncWithdraw(syncData);
         }
          
         else if(syncType == WITHDRAW_BATCH) {
-            _syncBatchTransfer(syncData);
+            _syncBatchWithdraw(syncData);
         }
         
         else {
@@ -95,13 +98,13 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
             
     }
     
-    function _syncTransfer(bytes memory syncData) internal {
+    function _syncWithdraw(bytes memory syncData) internal {
         (address rootToken, address childToken, address user, uint256 id, uint256 amount, bytes memory data) = abi.decode(syncData, (address, address, address, uint256, uint256, bytes));
         require(rootToChildTokens[rootToken] == childToken, "FxERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
         ERC1155(rootToken).safeTransferFrom(address(this), user, id, amount, data);
     }
     
-    function _syncBatchTransfer(bytes memory syncData) internal {
+    function _syncBatchWithdraw(bytes memory syncData) internal {
         (address rootToken, address childToken, address user, uint256[] memory ids, uint256[] memory amounts, bytes memory data) = abi.decode(syncData, (address, address, address, uint256[], uint256[], bytes));
         require(rootToChildTokens[rootToken] == childToken, "FxERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
         ERC1155(rootToken).safeBatchTransferFrom(address(this), user, ids, amounts, data);
