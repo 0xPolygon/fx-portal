@@ -14,6 +14,8 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
+    event TokenMapped(address indexed rootToken, address indexed childToken);
+
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
 
@@ -52,6 +54,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
+        emit TokenMapped(rootToken, childToken);
     }
 
     function deposit(address rootToken, address user, uint256 tokenId, bytes memory data) public {
