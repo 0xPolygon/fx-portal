@@ -13,6 +13,8 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
+    event TokenMapped(address indexed rootToken, address indexed childToken);
+
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
 
@@ -45,6 +47,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
+        emit TokenMapped(rootToken, childToken);
     }
 
     function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {
