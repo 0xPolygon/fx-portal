@@ -14,18 +14,20 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
     // maybe DEPOSIT and MAP_TOKEN can be reduced to bytes4
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
-    bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
+    //bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
     mapping(address => address) public rootToChildTokens;
     address public rootTokenTemplate;
+    bytes32 public childTokenTemplateCodeHash;
 
-    constructor(address _checkpointManager, address _fxRoot, address _rootTokenTemplate) FxBaseRootTunnel(_checkpointManager, _fxRoot) {
+     constructor(address _checkpointManager, address _fxRoot, address _rootTokenTemplate) FxBaseRootTunnel(_checkpointManager, _fxRoot) {
         rootTokenTemplate = _rootTokenTemplate;
     }
 
-    function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {
-        // map token if not mapped
-        require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC20RootTunnel: NO_MAPING_FOUND");
+
+    function deposit(address rootToken, address user, uint256 amount, bytes memory data) public  {
+        // map token if not mapped 
+        require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC20RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
         FxERC20(rootToken).transferFrom(
@@ -62,6 +64,9 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
             tokenObj.mint(address(this), amount.sub(balanceOf));
         }
 
+        //approve token transfer
+        tokenObj.approve(address(this), amount);
+        
         // transfer from tokens
         tokenObj.transferFrom(
             address(this),
