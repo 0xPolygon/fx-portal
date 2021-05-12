@@ -145,3 +145,4 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         return (size > 0);
     }
 }
+

@@ -96,3 +96,4 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         return (size > 0);
     }
 }
+
