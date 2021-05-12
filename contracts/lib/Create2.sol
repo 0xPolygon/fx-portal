@@ -19,14 +19,6 @@ abstract contract Create2 {
         require(_result != address(0), "Create2: Failed on minimal deploy");
     }
 
-    // get computed create2 address
-    function computedCreate2Address(bytes32 salt, bytes32 bytecodeHash, address deployer) internal pure returns (address) {
-        bytes32 _data = keccak256(
-            abi.encodePacked(bytes1(0xff), deployer, salt, bytecodeHash)
-        );
-        return address(uint160(uint256(_data)));
-    }
-
     // get minimal proxy creation code
     function minimalProxyCreationCode(address logic) internal pure returns (bytes memory) {
         bytes10 creation = 0x3d602d80600a3d3981f3;
@@ -34,5 +26,13 @@ abstract contract Create2 {
         bytes20 targetBytes = bytes20(logic);
         bytes15 suffix = 0x5af43d82803e903d91602b57fd5bf3;
         return abi.encodePacked(creation, prefix, targetBytes, suffix);
+    }
+
+    // get computed create2 address
+    function computedCreate2Address(bytes32 salt, bytes32 bytecodeHash, address deployer) public pure returns (address) {
+        bytes32 _data = keccak256(
+            abi.encodePacked(bytes1(0xff), deployer, salt, bytecodeHash)
+        );
+        return address(uint160(uint256(_data)));
     }
 }

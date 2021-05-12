@@ -59,7 +59,7 @@ abstract contract FxBaseChildTunnel is IFxMessageProcessor{
      * This is called by onStateReceive function.
      * Since it is called via a system call, any event will not be emitted during its execution.
      * @param stateId unique state id
-     * @param sender root messge sender
+     * @param sender root message sender
      * @param message bytes message that was sent from Root Tunnel
      */
     function _processMessageFromRoot(uint256 stateId, address sender, bytes memory message) virtual internal;
