@@ -51,7 +51,7 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
     }
     
     //To mint tokens on child chain
-    function mintToken(address childToken, uint256 amount) public {
+    function mintToken(address childToken, uint256 amount) public onlyOwner {
         FxERC20 childTokenContract = FxERC20(childToken);
          // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
