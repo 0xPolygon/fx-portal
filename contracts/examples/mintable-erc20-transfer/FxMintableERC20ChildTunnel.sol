@@ -6,12 +6,14 @@ import { Create2 } from '../../lib/Create2.sol';
 import { Ownable } from '../../lib/Ownable.sol';
 import { FxERC20 } from '../../tokens/FxERC20.sol';
 
+
 /**
  * @title FxMintableERC20ChildTunnel
  */
 contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
-    bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
+    //bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
+
 
     // event for token maping
     event TokenMapped(address indexed rootToken, address indexed childToken);
@@ -42,9 +44,28 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         // check if mapping is already there
         require(rootToChildToken[rootToken] == address(0x0), "FxMintableERC20ChildTunnel: ALREADY_MAPPED");
         rootToChildToken[rootToken] = childToken;
-
+        emit TokenMapped(rootToken,childToken);
+        
         // initialize child token with all parameters
         FxERC20(childToken).initialize(address(this), rootToken, name, symbol, decimals);
+    }
+    
+    //To mint tokens on child chain
+    function mintToken(address childToken, uint256 amount) public onlyOwner {
+        FxERC20 childTokenContract = FxERC20(childToken);
+         // child token contract will have root token
+        address rootToken = childTokenContract.connectedToken();
+        
+         // validate root and child token mapping
+        require(
+            childToken != address(0x0) &&
+            rootToken != address(0x0) &&
+            childToken == rootToChildToken[rootToken],
+            "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
+        );
+        
+        //mint token
+        childTokenContract.mint(msg.sender, amount);
     }
 
     function withdraw(address childToken, uint256 amount) public {
@@ -62,9 +83,9 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
 
         // withdraw tokens
         childTokenContract.burn(msg.sender, amount);
-
+        
         // name, symbol and decimals
-        FxERC20 rootTokenContract = FxERC20(rootToken);
+        FxERC20 rootTokenContract = FxERC20(childToken);
         string memory name = rootTokenContract.name();
         string memory symbol = rootTokenContract.symbol();
         uint8 decimals = rootTokenContract.decimals();
@@ -86,12 +107,14 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         // decode incoming data
         (bytes32 syncType, bytes memory syncData) = abi.decode(data, (bytes32, bytes));
 
+       
         if (syncType == DEPOSIT) {
             _syncDeposit(syncData);
-        } else {
+        }  else {
             revert("FxERC20ChildTunnel: INVALID_SYNC_TYPE");
         }
     }
+    
 
     function _syncDeposit(bytes memory syncData) internal {
         (address rootToken, address depositor, address to, uint256 amount, bytes memory depositData) = abi.decode(syncData, (address, address, address, uint256, bytes));
@@ -122,3 +145,4 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         return (size > 0);
     }
 }
+
