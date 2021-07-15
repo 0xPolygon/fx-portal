@@ -268,7 +268,6 @@ library RLPReader {
             assembly {
                 let byteLen := sub(byte0, 0xb7) // # of bytes the actual length is
                 memPtr := add(memPtr, 1) // skip over the first byte
-                
                 /* 32 byte word size */
                 let dataLen := div(mload(memPtr), exp(256, sub(32, byteLen))) // right shifting to get the len
                 itemLen := add(dataLen, add(byteLen, 1))
