@@ -2,7 +2,7 @@
 * @author Hamdi Allam hamdi.allam97@gmail.com
 * Please reach out with any questions or concerns
 */
-pragma solidity ^0.5.0;
+pragma solidity ^0.8.0;
 
 library RLPReader {
     uint8 constant STRING_SHORT_START = 0x80;
@@ -131,6 +131,13 @@ library RLPReader {
             result := keccak256(ptr, len)
         }
         return result;
+    }
+
+    function payloadLocation(RLPItem memory item) internal pure returns (uint, uint) {
+        uint offset = _payloadOffset(item.memPtr);
+        uint memPtr = item.memPtr + offset;
+        uint len = item.len - offset; // data length
+        return (memPtr, len);
     }
 
     /*
