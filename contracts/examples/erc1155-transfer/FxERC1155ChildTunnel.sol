@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
 import {IFxERC1155} from "../../tokens/IFxERC1155.sol";
 import {ERC1155Holder} from "../../lib/ERC1155Holder.sol" ;

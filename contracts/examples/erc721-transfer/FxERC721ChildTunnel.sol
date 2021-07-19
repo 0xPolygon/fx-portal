@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
 import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
 import { Create2 } from '../../lib/Create2.sol';
