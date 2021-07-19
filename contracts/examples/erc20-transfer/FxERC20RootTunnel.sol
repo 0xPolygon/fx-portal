@@ -4,13 +4,13 @@ pragma solidity ^0.8.0;
 import { ERC20 } from "../../lib/ERC20.sol";
 import { Create2 } from "../../lib/Create2.sol";
 import { FxBaseRootTunnel } from "../../tunnel/FxBaseRootTunnel.sol";
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {SafeERC20,IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 /**
  * @title FxERC20RootTunnel
  */
 contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
-    using SafeERC20 for ERC20;
+    using SafeERC20 for IERC20;
     // maybe DEPOSIT and MAP_TOKEN can be reduced to bytes4
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
@@ -59,7 +59,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
         }
 
         // transfer from depositor to this contract
-        ERC20(rootToken).safeTransferFrom(
+        IERC20(rootToken).safeTransferFrom(
             msg.sender,    // depositor
             address(this), // manager contract
             amount
@@ -77,7 +77,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
         require(rootToChildTokens[rootToken] == childToken, "FxERC20RootTunnel: INVALID_MAPPING_ON_EXIT");
 
         // transfer from tokens to
-        ERC20(rootToken).safeTransfer(
+        IERC20(rootToken).safeTransfer(
             to,
             amount
         );
