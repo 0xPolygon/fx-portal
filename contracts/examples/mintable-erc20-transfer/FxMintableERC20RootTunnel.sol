@@ -1,16 +1,19 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
 import { Create2 } from "../../lib/Create2.sol";
 import { SafeMath } from "../../lib/SafeMath.sol";
 import { FxERC20 } from "../../tokens/FxERC20.sol";
 import { FxBaseRootTunnel } from "../../tunnel/FxBaseRootTunnel.sol";
+import {SafeERC20,IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+
 
 /** 
  * @title FxMintableERC20RootTunnel
  */
 contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
     using SafeMath for uint256;
+    using SafeERC20 for IERC20;
 
     // maybe DEPOSIT and MAP_TOKEN can be reduced to bytes4
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
@@ -30,7 +33,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC20RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
-        FxERC20(rootToken).transferFrom(
+        IERC20(rootToken).safeTransferFrom(
             msg.sender,    // depositor
             address(this), // manager contract
             amount
@@ -68,7 +71,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         tokenObj.approve(address(this), amount);
         
         // transfer from tokens
-        tokenObj.transferFrom(
+        IERC20(rootToken).safeTransferFrom(
             address(this),
             to,
             amount
@@ -96,4 +99,3 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         return (size > 0);
     }
 }
-

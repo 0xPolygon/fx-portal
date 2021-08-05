@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
 // IStateReceiver represents interface to receive state
 interface IStateReceiver {
@@ -19,7 +19,7 @@ contract FxChild is IStateReceiver {
 
     event NewFxMessage(address rootMessageSender, address receiver, bytes data);
 
-    function setFxRoot(address _fxRoot) public {
+    function setFxRoot(address _fxRoot) external {
         require(fxRoot == address(0x0));
         fxRoot = _fxRoot;
     }

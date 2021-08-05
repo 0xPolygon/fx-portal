@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
 // IFxMessageProcessor represents interface to process message
 interface IFxMessageProcessor {
@@ -30,12 +30,12 @@ abstract contract FxBaseChildTunnel is IFxMessageProcessor{
     }
 
     // set fxRootTunnel if not set already
-    function setFxRootTunnel(address _fxRootTunnel) public {
+    function setFxRootTunnel(address _fxRootTunnel) external {
         require(fxRootTunnel == address(0x0), "FxBaseChildTunnel: ROOT_TUNNEL_ALREADY_SET");
         fxRootTunnel = _fxRootTunnel;
     }
 
-    function processMessageFromRoot(uint256 stateId, address rootMessageSender, bytes calldata data) public override {
+    function processMessageFromRoot(uint256 stateId, address rootMessageSender, bytes calldata data) external override {
         require(msg.sender == fxChild, "FxBaseChildTunnel: INVALID_SENDER");
         _processMessageFromRoot(stateId, rootMessageSender, data);
     }

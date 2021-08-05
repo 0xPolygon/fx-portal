@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
 import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
 import { Create2 } from '../../lib/Create2.sol';
@@ -33,7 +33,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
         return this.onERC721Received.selector;
     }
 
-    function withdraw(address childToken, uint256 tokenId, bytes memory data) public {
+    function withdraw(address childToken, uint256 tokenId, bytes memory data) external {
         IFxERC721 childTokenContract = IFxERC721(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
