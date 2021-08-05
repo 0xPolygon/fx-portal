@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.7.3;
+pragma solidity ^0.8.0;
 
 import { IERC721Metadata as ERC721 } from "../../lib/IERC721Metadata.sol";
 import { Create2 } from "../../lib/Create2.sol";
@@ -71,11 +71,8 @@ contract FxERC721URIStorageRootTunnel is FxBaseRootTunnel, Create2, IERC721Recei
             data
         );
 
-        // Get existing URI to transfer
-        string memory _tokenURI = ERC721(tokenId).tokenURI(tokenId);
-
         // DEPOSIT, encode(rootToken, depositor, user, tokenId, tokenURI, extra data)
-        bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, _tokenURI, data));
+        bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, ERC721(rootToken).tokenURI(tokenId), data));
         _sendMessageToChild(message);
     }
 
