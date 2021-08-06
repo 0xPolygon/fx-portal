@@ -7,9 +7,9 @@ import { IFxERC721URIStorage as IFxERC721 } from '../../tokens/IFxERC721URIStora
 import { IERC721Receiver } from "../../lib/IERC721Receiver.sol";
 
 /**
- * @title FxERC721ChildTunnel
+ * @title FxERC721URIStorageChildTunnel
  */
-contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
+contract FxERC721URIStorageChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
     string public constant SUFFIX_NAME = " (FXERC721)";

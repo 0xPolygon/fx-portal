@@ -8,7 +8,7 @@ import { IFxERC721URIStorage } from "./IFxERC721URIStorage.sol";
 /**
  * @title FxERC20 represents fx erc20
  */
-contract FxERC721 is IFxERC721URIStorage, ERC721URIStorage {
+contract FxERC721URIStorage is IFxERC721URIStorage, ERC721URIStorage {
     address internal _fxManager;
     address internal _connectedToken;
 
