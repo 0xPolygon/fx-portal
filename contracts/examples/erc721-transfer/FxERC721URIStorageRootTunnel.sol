@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { IERC721Metadata as ERC721 } from "../../lib/IERC721Metadata.sol";
+import { ERC721URIStorage as ERC721 } from "../../lib/ERC721URIStorage.sol";
 import { Create2 } from "../../lib/Create2.sol";
 import { FxBaseRootTunnel } from "../../tunnel/FxBaseRootTunnel.sol";
 import { IERC721Receiver } from "../../lib/IERC721Receiver.sol";
@@ -63,16 +63,20 @@ contract FxERC721URIStorageRootTunnel is FxBaseRootTunnel, Create2, IERC721Recei
             mapToken(rootToken);
         }
 
+        ERC721 rootTokenContract = ERC721(rootToken);
+
         // transfer from depositor to this contract
-        ERC721(rootToken).safeTransferFrom(
+        rootTokenContract.safeTransferFrom(
             msg.sender,    // depositor
             address(this), // manager contract
             tokenId,
             data
         );
 
+        string memory _tokenURI = rootTokenContract.tokenURI(tokenId);
+
         // DEPOSIT, encode(rootToken, depositor, user, tokenId, tokenURI, extra data)
-        bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, ERC721(rootToken).tokenURI(tokenId), data));
+        bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, _tokenURI, data));
         _sendMessageToChild(message);
     }
 
