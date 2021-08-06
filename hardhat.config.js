@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require("dotenv").config();
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -28,18 +29,21 @@ module.exports = {
   }
 };
 
-const PRIVATE_KEY=process.env.PRIVATE_KEY;
-const RPC_APIKEY=process.env.RPC_APIKEY;
-
-if(PRIVATE_KEY !== undefined && RPC_APIKEY !== undefined) {
+if(process.env.PRIVATE_KEY) {
   module.exports.networks = {
     goerli: {
-        url: `https://rpc.slock.it/goerli`,
-        accounts: [`0x${PRIVATE_KEY}`]
+      url: process.env.GOERLI_RPC || "https://rpc.slock.it/goerli",
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
     },
     mumbai: {
-      url: `https://rpc-mumbai.maticvigil.com/v1/${RPC_APIKEY}`,
-      accounts: [`0x${PRIVATE_KEY}`]
+      url: process.env.MUMBAI_RPC || "https://rpc-mumbai.maticvigil.com",
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
     }
   };
+}
+
+if(process.env.ETHERSCAN_APIKEY) {
+  module.exports.etherscan = {
+    apiKey: process.env.ETHERSCAN_APIKEY
+  }
 }
