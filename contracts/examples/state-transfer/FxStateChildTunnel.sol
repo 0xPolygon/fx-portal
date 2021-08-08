@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 
 import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
 
@@ -11,7 +11,7 @@ contract FxStateChildTunnel is FxBaseChildTunnel {
     address public latestRootMessageSender;
     bytes public latestData;
 
-    constructor(address _fxChild) FxBaseChildTunnel(_fxChild) {
+    constructor(address _fxChild) FxBaseChildTunnel(_fxChild) public {
 
     }
 

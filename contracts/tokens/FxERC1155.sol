@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 import {ERC1155} from "../lib/ERC1155.sol";
 import {IFxERC1155} from "./IFxERC1155.sol";
 
@@ -17,11 +17,11 @@ contract FxERC1155 is ERC1155, IFxERC1155 {
         setupMetaData(uri_);
     }
     
-    function fxManager() public override view returns (address) {
+    function fxManager() public override returns (address) {
       return _fxManager;
     }
 
-     function connectedToken() public override view returns (address) {
+     function connectedToken() public override returns (address) {
       return _connectedToken;
     }
     

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 
 // IFxMessageProcessor represents interface to process message
 interface IFxMessageProcessor {
@@ -19,7 +19,7 @@ abstract contract FxBaseChildTunnel is IFxMessageProcessor{
     // fx root tunnel
     address public fxRootTunnel;
 
-    constructor(address _fxChild) {
+    constructor(address _fxChild) public {
         fxChild = _fxChild;
     }
 

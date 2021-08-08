@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 
 import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
 import { Create2 } from '../../lib/Create2.sol';
@@ -21,7 +21,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     // token template
     address public tokenTemplate;
 
-    constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
+    constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) public {
         tokenTemplate = _tokenTemplate;
         require(_isContract(_tokenTemplate), "Token template is not contract");
     }

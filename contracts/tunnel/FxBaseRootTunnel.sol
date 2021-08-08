@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 
 
 import {RLPReader} from "../lib/RLPReader.sol";
@@ -45,7 +45,7 @@ abstract contract FxBaseRootTunnel {
     // storage to avoid duplicate exits
     mapping(bytes32 => bool) public processedExits;
 
-    constructor(address _checkpointManager, address _fxRoot) {
+    constructor(address _checkpointManager, address _fxRoot) public {
         checkpointManager = ICheckpointManager(_checkpointManager);
         fxRoot = IFxStateSender(_fxRoot);
     }

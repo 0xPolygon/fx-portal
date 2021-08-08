@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 
 import { ERC20 } from "../lib/ERC20.sol";
 import { IFxERC20 } from "./IFxERC20.sol";
@@ -22,12 +22,12 @@ contract FxERC20 is IFxERC20, ERC20 {
     }
 
     // fxManager rturns fx manager
-    function fxManager() public override view returns (address) {
+    function fxManager() public override returns (address) {
       return _fxManager;
     }
 
     // connectedToken returns root token
-    function connectedToken() public override view returns (address) {
+    function connectedToken() public override returns (address) {
       return _connectedToken;
     }
 

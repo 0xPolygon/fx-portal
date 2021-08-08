@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 
 import {IFxERC1155} from "../../tokens/IFxERC1155.sol";
 import {ERC1155Holder} from "../../lib/ERC1155Holder.sol" ;
@@ -19,7 +19,7 @@ contract FxERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder {
       mapping(address => address) public rootToChildToken;
       address public tokenTemplate;
       
-      constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
+      constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) public {
         tokenTemplate = _tokenTemplate;
         require(_isContract(_tokenTemplate), "Token template is not contract");
       }

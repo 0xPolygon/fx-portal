@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.0<0.7.0;
 
 import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
 import { Create2 } from '../../lib/Create2.sol';
@@ -22,18 +22,18 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
     // token template
     address public tokenTemplate;
 
-    constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
+    constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) public {
         tokenTemplate = _tokenTemplate;
         require(_isContract(_tokenTemplate), "Token template is not contract");
     }
 
     function onERC721Received(
         address /* operator */, address /* from */, uint256 /* tokenId */, bytes calldata /* data */
-        ) external pure override returns (bytes4) {
+        ) external override returns (bytes4) {
         return this.onERC721Received.selector;
     }
 
-    function withdraw(address childToken, uint256 tokenId, bytes memory data) external {
+    function withdraw(address childToken, uint256 tokenId, bytes calldata data) external {
         IFxERC721 childTokenContract = IFxERC721(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
