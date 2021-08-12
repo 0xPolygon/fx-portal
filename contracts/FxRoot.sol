@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.2<0.7.0;
 
 
 interface IStateSender {
@@ -17,7 +17,7 @@ contract FxRoot is IFxStateSender {
     IStateSender public stateSender;
     address public fxChild;
 
-    constructor(address _stateSender) {
+    constructor(address _stateSender) public {
         stateSender = IStateSender(_stateSender);
     }
 
@@ -26,7 +26,7 @@ contract FxRoot is IFxStateSender {
         fxChild = _fxChild;
     }
 
-    function sendMessageToChild(address _receiver, bytes calldata _data) public override {
+    function sendMessageToChild(address _receiver, bytes memory _data) public override {
         bytes memory data = abi.encode(msg.sender, _receiver, _data);
         stateSender.syncState(fxChild, data);
     }

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.2<0.7.0;
 
 import { ERC721 } from "../../lib/ERC721.sol";
 import { Create2 } from "../../lib/Create2.sol";
@@ -20,14 +20,14 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     bytes32 public childTokenTemplateCodeHash;
 
     constructor(address _checkpointManager, address _fxRoot, address _fxERC721Token)
-    FxBaseRootTunnel(_checkpointManager, _fxRoot) {
+    FxBaseRootTunnel(_checkpointManager, _fxRoot) public {
         // compute child token template code hash
         childTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_fxERC721Token));
     }
 
     function onERC721Received(
         address /* operator */, address /* from */, uint256 /* tokenId */, bytes calldata /* data */
-        ) external pure override returns (bytes4) {
+        ) external override returns (bytes4) {
         return this.onERC721Received.selector;
     }
 

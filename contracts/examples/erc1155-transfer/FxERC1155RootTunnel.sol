@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.2<0.7.0;
 
 import {ERC1155} from "../../lib/ERC1155.sol";
 import {ERC1155Holder} from "../../lib/ERC1155Holder.sol" ;
@@ -18,7 +18,7 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
     
-    constructor(address _checkpointManager, address _fxRoot, address _fxERC1155Token) FxBaseRootTunnel(_checkpointManager, _fxRoot) {
+    constructor(address _checkpointManager, address _fxRoot, address _fxERC1155Token) FxBaseRootTunnel(_checkpointManager, _fxRoot) public {
         childTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_fxERC1155Token));
     }
     

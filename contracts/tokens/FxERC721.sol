@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.0;
+pragma solidity >=0.6.2<0.7.0;
 
 import { ERC721 } from "../lib/ERC721.sol";
 import { IFxERC721 } from "./IFxERC721.sol";
@@ -22,12 +22,12 @@ contract FxERC721 is IFxERC721, ERC721 {
     }
 
     // fxManager returns fx manager
-    function fxManager() public override view returns (address) {
+    function fxManager() public override returns (address) {
       return _fxManager;
     }
 
     // connectedToken returns root token
-    function connectedToken() public override view returns (address) {
+    function connectedToken() public override returns (address) {
       return _connectedToken;
     }
 
