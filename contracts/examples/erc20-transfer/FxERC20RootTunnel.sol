@@ -14,8 +14,9 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
     // maybe DEPOSIT and MAP_TOKEN can be reduced to bytes4
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
+    bytes32 public constant ERC20Type = keccak256("ERC20");
 
-    event TokenMapped(address indexed rootToken, address indexed childToken);
+    event TokenMapped(address indexed rootToken, address indexed childToken, bytes32 tokenType);
 
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
@@ -49,7 +50,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
-        emit TokenMapped(rootToken, childToken);
+        emit TokenMapped(rootToken, childToken, ERC20Type);
     }
 
     function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {

@@ -12,8 +12,9 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
     bytes32 public constant WITHDRAW = keccak256("WITHDRAW");
     bytes32 public constant WITHDRAW_BATCH = keccak256("WITHDRAW_BATCH");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
+    bytes32 public constant ERC1155Type = keccak256("ERC1155");
     
-    event TokenMapped(address indexed rootToken, address indexed childToken);
+    event TokenMapped(address indexed rootToken, address indexed childToken, bytes32 tokenType);
 
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
@@ -38,7 +39,7 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
-         emit TokenMapped(rootToken, childToken);
+         emit TokenMapped(rootToken, childToken, ERC1155Type);
     }
     
     function deposit(address rootToken, address user, uint256 id, uint256 amount, bytes memory data) public {
