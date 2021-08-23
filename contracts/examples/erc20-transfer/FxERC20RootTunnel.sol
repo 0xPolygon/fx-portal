@@ -14,11 +14,10 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
     // maybe DEPOSIT and MAP_TOKEN can be reduced to bytes4
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
-    bytes32 public constant ERC20Type = keccak256("ERC20");
 
-    event TokenMapped(address indexed rootToken, address indexed childToken, bytes32 tokenType);
-    event FxWithdraw(address indexed rootToken, address indexed childToken, address userAddress, uint256 amount);
-    event FxDeposit(address indexed rootToken, address userAddress, uint256 amount);
+    event TokenMappedERC20(address indexed rootToken, address indexed childToken);
+    event FxWithdrawERC20(address indexed rootToken, address indexed childToken, address userAddress, uint256 amount);
+    event FxDepositERC20(address indexed rootToken, address userAddress, uint256 amount);
 
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
@@ -52,7 +51,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
-        emit TokenMapped(rootToken, childToken, ERC20Type);
+        emit TokenMappedERC20(rootToken, childToken);
     }
 
     function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {
@@ -71,7 +70,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
         // DEPOSIT, encode(rootToken, depositor, user, amount, extra data)
         bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, amount, data));
         _sendMessageToChild(message);
-        emit FxDeposit(rootToken, user, amount);
+        emit FxDepositERC20(rootToken, user, amount);
     }
 
     // exit processor
@@ -85,6 +84,6 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
             to,
             amount
         );
-        emit FxWithdraw(rootToken, childToken, to, amount);
+        emit FxWithdrawERC20(rootToken, childToken, to, amount);
     }
 }
