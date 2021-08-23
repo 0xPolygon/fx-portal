@@ -17,6 +17,8 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
     bytes32 public constant ERC20Type = keccak256("ERC20");
 
     event TokenMapped(address indexed rootToken, address indexed childToken, bytes32 tokenType);
+    event FxWithdraw(address indexed rootToken, address indexed childToken, address userAddress, uint256 amount);
+    event FxDeposit(address indexed rootToken, address userAddress, uint256 amount);
 
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
@@ -69,6 +71,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
         // DEPOSIT, encode(rootToken, depositor, user, amount, extra data)
         bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, amount, data));
         _sendMessageToChild(message);
+        emit FxDeposit(rootToken, user, amount);
     }
 
     // exit processor
@@ -82,5 +85,6 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
             to,
             amount
         );
+        emit FxWithdraw(rootToken, childToken, to, amount);
     }
 }

@@ -16,6 +16,8 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     bytes32 public constant ERC721Type = keccak256("ERC721");
 
     event TokenMapped(address indexed rootToken, address indexed childToken, bytes32 tokenType);
+    event FxWithdraw(address indexed rootToken, address indexed childToken, address userAddress, uint256 id);
+    event FxDeposit(address indexed rootToken, address indexed userAddress, uint256 id);
 
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
@@ -75,6 +77,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
         // DEPOSIT, encode(rootToken, depositor, user, tokenId, extra data)
         bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, data));
         _sendMessageToChild(message);
+        emit FxDeposit(rootToken, user, tokenId);
     }
 
     // exit processor
@@ -90,5 +93,6 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
             tokenId, 
             syncData
         );
+        emit FxWithdraw(rootToken, childToken, to, tokenId);
     }
 }
