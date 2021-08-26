@@ -14,10 +14,10 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
     
     event TokenMappedERC1155(address indexed rootToken, address indexed childToken);
-    event FxWithdrawERC1155(address indexed rootToken, address indexed childToken, address userAddress, uint256 id, uint256 amount);
-    event FxDepositERC1155(address indexed rootToken, address indexed userAddress, uint256 id, uint256 amount);
-    event FxWithdrawBatchERC1155(address indexed rootToken, address indexed childToken, address userAddress, uint256[] ids, uint256[] amounts);
-    event FxDepositBatchERC1155(address indexed rootToken, address userAddress, uint256[] ids, uint256[] amounts);
+    event FxWithdrawERC1155(address indexed rootToken, address indexed childToken, address indexed userAddress, uint256 id, uint256 amount);
+    event FxDepositERC1155(address indexed rootToken, address indexed depositor, address indexed userAddress, uint256 id, uint256 amount);
+    event FxWithdrawBatchERC1155(address indexed rootToken, address indexed childToken, address indexed userAddress, uint256[] ids, uint256[] amounts);
+    event FxDepositBatchERC1155(address indexed rootToken, address indexed userAddress, uint256[] ids, uint256[] amounts);
 
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
@@ -63,7 +63,7 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
         // DEPOSIT, encode(rootToken, depositor, user, id, amount, extra data)
         bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, id, amount, data));
         _sendMessageToChild(message);
-        emit FxDepositERC1155(rootToken, user, id, amount);
+        emit FxDepositERC1155(rootToken, msg.sender, user, id, amount);
     }
     
     function depositBatch(address rootToken, address user, uint256[] memory ids, uint256[] memory amounts, bytes memory data) public {
