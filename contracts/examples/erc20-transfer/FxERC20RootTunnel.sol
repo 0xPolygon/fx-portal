@@ -15,7 +15,9 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
-    event TokenMapped(address indexed rootToken, address indexed childToken);
+    event TokenMappedERC20(address indexed rootToken, address indexed childToken);
+    event FxWithdrawERC20(address indexed rootToken, address indexed childToken, address indexed userAddress, uint256 amount);
+    event FxDepositERC20(address indexed rootToken, address indexed depositor, address indexed userAddress, uint256 amount);
 
     mapping(address => address) public rootToChildTokens;
     bytes32 public childTokenTemplateCodeHash;
@@ -49,7 +51,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
-        emit TokenMapped(rootToken, childToken);
+        emit TokenMappedERC20(rootToken, childToken);
     }
 
     function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {
@@ -68,6 +70,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
         // DEPOSIT, encode(rootToken, depositor, user, amount, extra data)
         bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, amount, data));
         _sendMessageToChild(message);
+        emit FxDepositERC20(rootToken, msg.sender, user, amount);
     }
 
     // exit processor
@@ -81,5 +84,6 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
             to,
             amount
         );
+        emit FxWithdrawERC20(rootToken, childToken, to, amount);
     }
 }

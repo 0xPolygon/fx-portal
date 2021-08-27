@@ -1,6 +1,6 @@
 {
   "name": "fx-portal",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "FxPortal for Matic chain. No mapping. Seamless.",
   "main": "index.js",
   "scripts": {
