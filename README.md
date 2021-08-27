@@ -2,6 +2,8 @@
 
 FxPortal for Polygon(prev Matic)Chain. No mapping. Seamless communication with Ethereum Network.
 
+Audit - [Fx-Portal Contracts Audit by Halborn](https://github.com/fx-portal/contracts/blob/main/Polygon_FX_Portal_Smart_Contract_Security_Audit_Halborn_v1_0%20(1).pdf)
+
 ### What is Fx bridge (fx-portal)?
 
 **It is a powerful yet simple implementation Polygon [state sync](https://docs.matic.network/docs/contribute/state-sync) mechanism. Polygon PoS bridge is based on it. The code in the `examples` folder are examples of the usage of this methodology. You can use these examples to build your own implementations or own custom bridge.**
