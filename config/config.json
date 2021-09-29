@@ -8,6 +8,15 @@
         },
         "checkpointManager":{
             "address":"0x86E4Dc95c7FBdBf52e33D563BbDB00823894C287"
+        },
+        "fxERC20":{
+            "address":"0xAd87e3b217c66B0D45dEaFBC540330d300811b94"
+        },
+        "fxERC721":{
+            "address":"0x467c9BA5DAB81C8975F7d8237ECe61918AA6e8fF"
+        },
+        "fxERC1155":{
+            "address":"0x4443c9877aB1767e1080fa70Ac038758e526c609"
         }
     },
     "testnet":{
@@ -19,6 +28,15 @@
         },
         "checkpointManager":{
             "address":"0x2890bA17EfE978480615e330ecB65333b880928e"
+        },
+        "fxERC20":{
+            "address":"0xDDE69724AeFBdb084413719fE745aB66e3b055C7"
+        },
+        "fxERC721":{
+            "address":"0xf2720927E048726267C0221ffA41A88528048726"
+        },
+        "fxERC1155":{
+            "address":"0x80be8Cf927047A40d3f5791BF7436D8c95b3Ae5C"
         }
     }
 }
