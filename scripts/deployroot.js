@@ -1,5 +1,6 @@
-const hre = require('hardhat')
 require('dotenv').config()
+const config = require('../config/config.json')
+const hre = require('hardhat')
 
 async function main () {
   let fxRoot, checkpointManager
@@ -7,11 +8,11 @@ async function main () {
   const network = await hre.ethers.provider.getNetwork()
 
   if (network.chainId === 1) { // Ethereum Mainnet
-    fxRoot = '0xfe5e5D361b2ad62c541bAb87C45a0B9B018389a2'
-    checkpointManager = '0x86E4Dc95c7FBdBf52e33D563BbDB00823894C287'
+    fxRoot = config.mainnet.fxRoot.address
+    checkpointManager = config.mainnet.checkpointManager.address
   } else if (network.chainId === 5) { // Goerli Testnet
-    fxRoot = '0x3d1d3E34f7fB6D26245E6640E1c50710eFFf15bA'
-    checkpointManager = '0x2890bA17EfE978480615e330ecB65333b880928e'
+    fxRoot = config.testnet.fxRoot.address
+    checkpointManager = config.testnet.checkpointManager.address
   } else {
     fxRoot = process.env.FX_ROOT
     checkpointManager = process.env.CHECKPOINT_MANAGER

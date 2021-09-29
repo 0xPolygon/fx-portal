@@ -1,5 +1,6 @@
-const hre = require('hardhat')
 require('dotenv').config()
+const config = require('../config/config.json')
+const hre = require('hardhat')
 
 async function main () {
   let fxChild
@@ -7,9 +8,9 @@ async function main () {
   const network = await hre.ethers.provider.getNetwork()
 
   if (network.chainId === 137) { // Polygon Mainnet
-    fxChild = '0x8397259c983751DAf40400790063935a11afa28a'
+    fxChild = config.mainnet.fxChild.address
   } else if (network.chainId === 80001) { // Mumbai Testnet
-    fxChild = '0xCf73231F28B7331BBe3124B907840A94851f9f11'
+    fxChild = config.testnet.fxChild.address
   } else {
     fxChild = process.env.FX_CHILD
   }
