@@ -1,45 +1,41 @@
-require("@nomiclabs/hardhat-waffle");
-require("dotenv").config();
-
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async () => {
-  const accounts = await ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
+require('dotenv').config()
+require('@nomiclabs/hardhat-waffle')
+require('@nomiclabs/hardhat-etherscan')
 // You need to export an object to set up your config
 // Go to https://hardhat.org/config/ to learn more
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
-
 module.exports = {
   solidity: {
-    compilers: [
-      {
-        version: "0.8.0"
+    version: '0.8.0',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 9999
       }
-    ]
-  }
-};
-
-const PRIVATE_KEY=process.env.PRIVATE_KEY;
-const RPC_APIKEY=process.env.RPC_APIKEY;
-
-if(PRIVATE_KEY !== undefined && RPC_APIKEY !== undefined) {
-  module.exports.networks = {
+    }
+  },
+  networks: {
+    mainnet: {
+      url: process.env.MAINNET_RPC || 'https://main-light.eth.linkpool.io',
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
+    },
     goerli: {
-        url: `https://rpc.slock.it/goerli`,
-        accounts: [`0x${PRIVATE_KEY}`]
+      url: process.env.GOERLI_RPC || 'https://goerli-light.eth.linkpool.io',
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
+    },
+    polygon: {
+      url: process.env.POLYGON_RPC || 'https://polygon-rpc.com',
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
     },
     mumbai: {
-      url: `https://rpc-mumbai.maticvigil.com/v1/${RPC_APIKEY}`,
-      accounts: [`0x${PRIVATE_KEY}`]
+      url: process.env.MUMBAI_RPC || 'https://rpc-mumbai.maticvigil.com',
+      accounts: [`0x${process.env.PRIVATE_KEY}`]
     }
-  };
+  },
+  etherscan: {
+    apiKey: process.env.ETHERSCAN_API_KEY
+  }
 }
