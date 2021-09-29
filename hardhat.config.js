@@ -7,6 +7,13 @@ require('@nomiclabs/hardhat-etherscan')
 /**
  * @type import('hardhat/config').HardhatUserConfig
  */
+
+let accounts = []
+
+if (process.env.PRIVATE_KEY) {
+  accounts = [`0x${process.env.PRIVATE_KEY}`, ...accounts]
+}
+
 module.exports = {
   solidity: {
     version: '0.8.0',
@@ -20,19 +27,19 @@ module.exports = {
   networks: {
     mainnet: {
       url: process.env.MAINNET_RPC || 'https://main-light.eth.linkpool.io',
-      accounts: [`0x${process.env.PRIVATE_KEY}`]
+      accounts
     },
     goerli: {
       url: process.env.GOERLI_RPC || 'https://goerli-light.eth.linkpool.io',
-      accounts: [`0x${process.env.PRIVATE_KEY}`]
+      accounts
     },
     polygon: {
       url: process.env.POLYGON_RPC || 'https://polygon-rpc.com',
-      accounts: [`0x${process.env.PRIVATE_KEY}`]
+      accounts
     },
     mumbai: {
       url: process.env.MUMBAI_RPC || 'https://rpc-mumbai.maticvigil.com',
-      accounts: [`0x${process.env.PRIVATE_KEY}`]
+      accounts
     }
   },
   etherscan: {
