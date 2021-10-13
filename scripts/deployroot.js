@@ -3,9 +3,9 @@ const config = require('../config/config.json')
 const hre = require('hardhat')
 
 // Use your own deployed child tunnel addresses here instead!
-const fxERC20ChildTunnel = '0x918cc10cf2393bb9803f9d9D3219539a1e736dd9'
-const fxERC721ChildTunnel = '0xdC335C19868d49aCa554AA64d5ae8524A093De5b'
-const fxERC1155ChildTunnel = '0x46d40260e48A6164bbF24206D3AB9426a41D8664'
+const fxERC20ChildTunnel = '0x587C9FF1c528C7aeE2804Bf5301Dc2ec057A75a8'
+const fxERC721ChildTunnel = '0x96d26FCA4cB14e14CABc28eF8bc8Aba0E03702A8'
+const fxERC1155ChildTunnel = '0x24a16Db524d342968A11b9E1aD75b6D5eD002db7'
 
 async function main () {
   let fxRoot, checkpointManager, fxERC20, fxERC721, fxERC1155
@@ -38,6 +38,7 @@ async function main () {
   console.log(erc20.deployTransaction)
   await erc20.deployTransaction.wait()
   console.log('ERC20RootTunnel deployed to:', erc20.address)
+  console.log('npx hardhat verify --network goerli', erc20.address, checkpointManager, fxRoot, fxERC20)
 
   const setERC20Child = await erc20.setFxChildTunnel(fxERC20ChildTunnel)
   console.log(setERC20Child)
@@ -49,6 +50,7 @@ async function main () {
   console.log(erc721.deployTransaction)
   await erc721.deployTransaction.wait()
   console.log('ERC721RootTunnel deployed to:', erc721.address)
+  console.log('npx hardhat verify --network goerli', erc721.address, checkpointManager, fxRoot, fxERC721)
 
   const setERC721Child = await erc721.setFxChildTunnel(fxERC721ChildTunnel)
   console.log(setERC721Child)
@@ -60,6 +62,7 @@ async function main () {
   console.log(erc1155.deployTransaction)
   await erc1155.deployTransaction.wait()
   console.log('ERC1155RootTunnel deployed to:', erc1155.address)
+  console.log('npx hardhat verify --network goerli', erc1155.address, checkpointManager, fxRoot, fxERC1155)
 
   const setERC1155Child = await erc1155.setFxChildTunnel(fxERC1155ChildTunnel)
   console.log(setERC1155Child)
