@@ -1,6 +1,6 @@
 {
   "name": "@maticnetwork/fx-portal",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "FxPortal for Polygon chain. No mapping. Seamless.",
   "main": "index.js",
   "scripts": {
