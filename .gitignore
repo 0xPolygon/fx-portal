@@ -110,3 +110,4 @@ node_modules
 cache
 artifacts
 internal
+types
