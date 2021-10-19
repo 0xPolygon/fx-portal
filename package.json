@@ -21,16 +21,26 @@
   },
   "homepage": "https://github.com/jdkanani/fx-portal#readme",
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.10",
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "^4.3.0",
+    "@typechain/ethers-v5": "^7.0.1",
     "chai": "^4.2.0",
     "dotenv": "^8.2.0",
     "ethereum-waffle": "^3.2.1",
-    "ethers": "^5.0.24",
-    "hardhat": "^2.0.7"
+    "ethers": "^5.4.4",
+    "hardhat": "^2.0.7",
+    "hardhat-contract-sizer": "^2.0.3",
+    "hardhat-deploy": "^0.8.11",
+    "hardhat-gas-reporter": "^1.0.4",
+    "solidity-coverage": "^0.7.16",
+    "ts-node": "^10.3.0",
+    "typechain": "^5.1.2",
+    "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.2.0"
+    "@typechain/hardhat": "^2.3.0",
+    "ts-generator": "^0.1.1"
   }
 }
