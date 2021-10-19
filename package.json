@@ -1,14 +1,14 @@
 {
-  "name": "fx-portal",
-  "version": "1.0.2",
-  "description": "FxPortal for Matic chain. No mapping. Seamless.",
+  "name": "@maticnetwork/fx-portal",
+  "version": "1.0.4",
+  "description": "FxPortal for Polygon chain. No mapping. Seamless.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jdkanani/fx-portal.git"
+    "url": "git+https://github.com/fx-portal/contracts.git"
   },
   "keywords": [
     "ethereum",
@@ -17,9 +17,9 @@
   "author": "Jaynti Kanani <jdkanani@gmail.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/jdkanani/fx-portal/issues"
+    "url": "https://github.com/fx-portal/contracts/issues"
   },
-  "homepage": "https://github.com/jdkanani/fx-portal#readme",
+  "homepage": "https://github.com/fx-portal/contracts#readme",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "npm:hardhat-deploy-ethers@^0.3.0-beta.10",
     "@nomiclabs/hardhat-etherscan": "^2.1.6",
