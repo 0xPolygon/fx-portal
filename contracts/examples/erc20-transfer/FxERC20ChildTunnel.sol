@@ -27,23 +27,11 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     }
 
     function withdraw(address childToken, uint256 amount) public {
-        IFxERC20 childTokenContract = IFxERC20(childToken);
-        // child token contract will have root token
-        address rootToken = childTokenContract.connectedToken();
+        _withdraw(childToken, msg.sender, amount);
+    }
 
-        // validate root and child token mapping
-        require(
-            childToken != address(0x0) &&
-            rootToken != address(0x0) && 
-            childToken == rootToChildToken[rootToken], 
-            "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
-        );
-
-        // withdraw tokens
-        childTokenContract.burn(msg.sender, amount);
-
-        // send message to root regarding token burn
-        _sendMessageToRoot(abi.encode(rootToken, childToken, msg.sender, amount));
+    function withdrawTo(address childToken, address receiver, uint256 amount) public {
+        _withdraw(childToken, receiver, amount);
     }
 
     //
@@ -107,6 +95,26 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
                 success := call(txGas, to, 0, add(data, 0x20), mload(data), 0, 0)
             }
         }
+    }
+
+    function _withdraw(address childToken, address receiver, uint256 amount) internal {
+        IFxERC20 childTokenContract = IFxERC20(childToken);
+        // child token contract will have root token
+        address rootToken = childTokenContract.connectedToken();
+
+        // validate root and child token mapping
+        require(
+            childToken != address(0x0) &&
+            rootToken != address(0x0) &&
+            childToken == rootToChildToken[rootToken],
+            "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
+        );
+
+        // withdraw tokens
+        childTokenContract.burn(msg.sender, amount);
+
+        // send message to root regarding token burn
+        _sendMessageToRoot(abi.encode(rootToken, childToken, receiver, amount));
     }
 
     // check if address is contract
