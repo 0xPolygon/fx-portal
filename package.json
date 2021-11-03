@@ -28,7 +28,9 @@
     "dotenv": "^8.2.0",
     "ethereum-waffle": "^3.2.1",
     "ethers": "^5.0.24",
-    "hardhat": "^2.0.7"
+    "hardhat": "^2.0.7",
+    "prettier": "2.4.1",
+    "prettier-plugin-solidity": "^1.0.0-beta.18"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.2.0"

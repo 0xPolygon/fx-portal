@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-
 // Create2 adds common methods for minimal proxy with create2
 abstract contract Create2 {
     // creates clone using minimal proxy
@@ -29,10 +28,12 @@ abstract contract Create2 {
     }
 
     // get computed create2 address
-    function computedCreate2Address(bytes32 salt, bytes32 bytecodeHash, address deployer) public pure returns (address) {
-        bytes32 _data = keccak256(
-            abi.encodePacked(bytes1(0xff), deployer, salt, bytecodeHash)
-        );
+    function computedCreate2Address(
+        bytes32 salt,
+        bytes32 bytecodeHash,
+        address deployer
+    ) public pure returns (address) {
+        bytes32 _data = keccak256(abi.encodePacked(bytes1(0xff), deployer, salt, bytecodeHash));
         return address(uint160(uint256(_data)));
     }
 }

@@ -1,42 +1,42 @@
 {
-    "mainnet":{
-        "fxRoot":{
-            "address":"0xfe5e5D361b2ad62c541bAb87C45a0B9B018389a2"
-        },
-        "fxChild":{
-            "address":"0x8397259c983751DAf40400790063935a11afa28a"
-        },
-        "checkpointManager":{
-            "address":"0x86E4Dc95c7FBdBf52e33D563BbDB00823894C287"
-        },
-        "fxERC20":{
-            "address":"0xAd87e3b217c66B0D45dEaFBC540330d300811b94"
-        },
-        "fxERC721":{
-            "address":"0x467c9BA5DAB81C8975F7d8237ECe61918AA6e8fF"
-        },
-        "fxERC1155":{
-            "address":"0x4443c9877aB1767e1080fa70Ac038758e526c609"
-        }
+  "mainnet": {
+    "fxRoot": {
+      "address": "0xfe5e5D361b2ad62c541bAb87C45a0B9B018389a2"
     },
-    "testnet":{
-        "fxRoot":{
-            "address":"0x3d1d3E34f7fB6D26245E6640E1c50710eFFf15bA"
-        },
-        "fxChild":{
-            "address":"0xCf73231F28B7331BBe3124B907840A94851f9f11"
-        },
-        "checkpointManager":{
-            "address":"0x2890bA17EfE978480615e330ecB65333b880928e"
-        },
-        "fxERC20":{
-            "address":"0xDDE69724AeFBdb084413719fE745aB66e3b055C7"
-        },
-        "fxERC721":{
-            "address":"0xf2720927E048726267C0221ffA41A88528048726"
-        },
-        "fxERC1155":{
-            "address":"0x80be8Cf927047A40d3f5791BF7436D8c95b3Ae5C"
-        }
+    "fxChild": {
+      "address": "0x8397259c983751DAf40400790063935a11afa28a"
+    },
+    "checkpointManager": {
+      "address": "0x86E4Dc95c7FBdBf52e33D563BbDB00823894C287"
+    },
+    "fxERC20": {
+      "address": "0xAd87e3b217c66B0D45dEaFBC540330d300811b94"
+    },
+    "fxERC721": {
+      "address": "0x467c9BA5DAB81C8975F7d8237ECe61918AA6e8fF"
+    },
+    "fxERC1155": {
+      "address": "0x4443c9877aB1767e1080fa70Ac038758e526c609"
     }
+  },
+  "testnet": {
+    "fxRoot": {
+      "address": "0x3d1d3E34f7fB6D26245E6640E1c50710eFFf15bA"
+    },
+    "fxChild": {
+      "address": "0xCf73231F28B7331BBe3124B907840A94851f9f11"
+    },
+    "checkpointManager": {
+      "address": "0x2890bA17EfE978480615e330ecB65333b880928e"
+    },
+    "fxERC20": {
+      "address": "0xDDE69724AeFBdb084413719fE745aB66e3b055C7"
+    },
+    "fxERC721": {
+      "address": "0xf2720927E048726267C0221ffA41A88528048726"
+    },
+    "fxERC1155": {
+      "address": "0x80be8Cf927047A40d3f5791BF7436D8c95b3Ae5C"
+    }
+  }
 }
