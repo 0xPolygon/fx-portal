@@ -45,6 +45,9 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
             childToken == rootToChildToken[rootToken],
             "FxERC721ChildTunnel: NO_MAPPED_TOKEN"
         );
+        
+        // check owner of the NFT
+        require(msg.sender == childTokenContract.ownerOf(tokenId));
 
         // withdraw tokens
         childTokenContract.burn(tokenId);
