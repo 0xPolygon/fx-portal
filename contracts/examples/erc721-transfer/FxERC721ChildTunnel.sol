@@ -129,6 +129,8 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
             "FxERC721ChildTunnel: NO_MAPPED_TOKEN"
         );
 
+        require(msg.sender == childTokenContract.ownerOf(tokenId));
+
         // withdraw tokens
         childTokenContract.burn(tokenId);
 
