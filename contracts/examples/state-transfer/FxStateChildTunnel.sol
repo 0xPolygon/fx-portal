@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import { FxBaseChildTunnel } from '../../tunnel/FxBaseChildTunnel.sol';
+import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 
-/** 
+/**
  * @title FxStateChildTunnel
  */
 contract FxStateChildTunnel is FxBaseChildTunnel {
@@ -11,15 +11,13 @@ contract FxStateChildTunnel is FxBaseChildTunnel {
     address public latestRootMessageSender;
     bytes public latestData;
 
-    constructor(address _fxChild) FxBaseChildTunnel(_fxChild) {
+    constructor(address _fxChild) FxBaseChildTunnel(_fxChild) {}
 
-    }
-
-    function _processMessageFromRoot(uint256 stateId, address sender, bytes memory data)
-        internal
-        override
-        validateSender(sender) {
-
+    function _processMessageFromRoot(
+        uint256 stateId,
+        address sender,
+        bytes memory data
+    ) internal override validateSender(sender) {
         latestStateId = stateId;
         latestRootMessageSender = sender;
         latestData = data;

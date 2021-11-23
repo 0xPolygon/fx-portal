@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-
 interface IStateSender {
     function syncState(address receiver, bytes calldata data) external;
 }
@@ -10,7 +9,7 @@ interface IFxStateSender {
     function sendMessageToChild(address _receiver, bytes calldata _data) external;
 }
 
-/** 
+/**
  * @title FxRoot root contract for fx-portal
  */
 contract FxRoot is IFxStateSender {
