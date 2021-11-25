@@ -51,12 +51,18 @@ const overrides = {
 export async function childFixture([wallet]: Signer[]): Promise<ChildFixture> {
   
   const fxChild = await new FxChild__factory(wallet).deploy(overrides);
+
   const erc20Token = await new FxERC20__factory(wallet).deploy(overrides);
   const erc20 = await new FxERC20ChildTunnel__factory(wallet).deploy(fxChild.address, erc20Token.address, overrides);
+  await erc20Token.initialize(await wallet.getAddress(), erc20.address, "FxERC20", "FE2", 18);
+
   const erc721Token = await new FxERC721__factory(wallet).deploy(overrides);
   const erc721 = await new FxERC721ChildTunnel__factory(wallet).deploy(fxChild.address, erc721Token.address, overrides);
+  await erc721Token.initialize(await wallet.getAddress(), erc721.address, "FxERC721", "FE7");
+
   const erc1155Token = await new FxERC1155__factory(wallet).deploy(overrides);
   const erc1155 = await new FxERC1155ChildTunnel__factory(wallet).deploy(fxChild.address, erc1155Token.address, overrides);
+  await erc1155Token.initialize(await wallet.getAddress(), erc1155.address, "https://");
 
   return { 
     fxChild,
@@ -69,9 +75,9 @@ export async function childFixture([wallet]: Signer[]): Promise<ChildFixture> {
   };
 }
 
-export async function rootFixture([wallet]: Signer[]): Promise<RootFixture> {
-  const checkpointManager: string = "";
-  const stateSender: string = "";
+export async function rootFixture([wallet]: Signer[], cFixture: ChildFixture, ): Promise<RootFixture> {
+  const checkpointManager: string = "0x600e7E2B520D51a7FE5e404E73Fb0D98bF2A913E";
+  const stateSender: string = "0x600e7E2B520D51a7FE5e404E73Fb0D98bF2A913E";
   // const fxERC20, fxERC721, fxERC1155;
 
   const { 
@@ -82,7 +88,7 @@ export async function rootFixture([wallet]: Signer[]): Promise<RootFixture> {
     erc721: fxERC721ChildTunnel,
     erc1155Token: fxERC1155,
     erc1155: fxERC1155ChildTunnel
-  } = await childFixture([wallet]);
+  } = cFixture;
 
   const fxRoot = await new FxRoot__factory(wallet).deploy(stateSender, overrides);
   await fxChild.setFxRoot(fxRoot.address);
@@ -90,19 +96,19 @@ export async function rootFixture([wallet]: Signer[]): Promise<RootFixture> {
 
   const erc20 = await new FxERC20RootTunnel__factory(wallet).deploy(checkpointManager, fxRoot.address, fxERC20.address, overrides);
   const setERC20Child = await erc20.setFxChildTunnel(fxERC20ChildTunnel.address)
-  console.log(setERC20Child)
+  // console.log(setERC20Child)
   await setERC20Child.wait()
   console.log('ERC20ChildTunnel set')
 
   const erc721 = await new FxERC721RootTunnel__factory(wallet).deploy(checkpointManager, fxRoot.address, fxERC721.address, overrides);
   const setERC721Child = await erc721.setFxChildTunnel(fxERC721ChildTunnel.address)
-  console.log(setERC721Child)
+  // console.log(setERC721Child)
   await setERC721Child.wait()
   console.log('ERC721ChildTunnel set')
 
   const erc1155 = await new FxERC1155RootTunnel__factory(wallet).deploy(checkpointManager, fxRoot.address, fxERC1155.address, overrides);
   const setERC1155Child = await erc1155.setFxChildTunnel(fxERC1155ChildTunnel.address)
-  console.log(setERC1155Child)
+  // console.log(setERC1155Child)
   await setERC1155Child.wait()
   console.log('ERC1155ChildTunnel set')
   
