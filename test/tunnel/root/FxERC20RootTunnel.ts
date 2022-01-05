@@ -64,6 +64,6 @@ describe('FxERC20', () => {
   });
 
   it('fxRoot, template', async () => {
-    
+    await fxERC20RootTunnel.mapToken(fxERC20.address);
   });
 });

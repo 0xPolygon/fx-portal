@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
+import "hardhat/console.sol";
 
 // IStateReceiver represents interface to receive state
 interface IStateReceiver {
@@ -25,9 +26,15 @@ contract FxChild is IStateReceiver {
     }
 
     function onStateReceive(uint256 stateId, bytes calldata _data) external override {
-        require(msg.sender == address(0x0000000000000000000000000000000000001001), "Invalid sender");
+        // require(msg.sender == address(0x0000000000000000000000000000000000001001), "Invalid sender");
         (address rootMessageSender, address receiver, bytes memory data) = abi.decode(_data, (address, address, bytes));
         emit NewFxMessage(rootMessageSender, receiver, data);
+        console.log("*************************************");
+        console.log(receiver);
+        console.log(rootMessageSender);
+        console.logBytes(data);
+        console.log("*************************************");
         IFxMessageProcessor(receiver).processMessageFromRoot(stateId, rootMessageSender, data);
+        
     }
 }

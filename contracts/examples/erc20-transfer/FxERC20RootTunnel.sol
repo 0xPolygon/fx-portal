@@ -5,6 +5,8 @@ import { ERC20 } from "../../lib/ERC20.sol";
 import { Create2 } from "../../lib/Create2.sol";
 import { FxBaseRootTunnel } from "../../tunnel/FxBaseRootTunnel.sol";
 import {SafeERC20,IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import "hardhat/console.sol";
+
 
 /**
  * @title FxERC20RootTunnel
@@ -43,6 +45,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // MAP_TOKEN, encode(rootToken, name, symbol, decimals)
         bytes memory message = abi.encode(MAP_TOKEN, abi.encode(rootToken, name, symbol, decimals));
+        console.logBytes(message);
         _sendMessageToChild(message);
 
         // compute child token address before deployment using create2

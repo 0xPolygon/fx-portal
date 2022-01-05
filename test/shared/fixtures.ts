@@ -24,6 +24,11 @@ import { FxERC721RootTunnel__factory } from '../../types/factories/FxERC721RootT
 import { FxERC1155RootTunnel } from '../../types/FxERC1155RootTunnel';
 import { FxERC1155RootTunnel__factory } from '../../types/factories/FxERC1155RootTunnel__factory';
 
+import { StateSender } from '../../types/StateSender';
+import { StateSender__factory } from '../../types/factories/StateSender__factory';
+import { StateReceiver } from '../../types/StateReceiver';
+import { StateReceiver__factory } from '../../types/factories/StateReceiver__factory';
+
 const TOTAL_SUPPLY = expandTo18Decimals(10000);
 
 interface ChildFixture {
@@ -34,6 +39,17 @@ interface ChildFixture {
   erc721: FxERC721ChildTunnel;
   erc1155Token: FxERC1155;
   erc1155: FxERC1155ChildTunnel;
+}
+
+interface TunnelFixture {
+  fxChild: FxChild;
+  erc20Token: FxERC20;
+  erc20: FxERC20ChildTunnel;
+  erc721Token: FxERC721;
+  erc721: FxERC721ChildTunnel;
+  erc1155Token: FxERC1155;
+  erc1155: FxERC1155ChildTunnel;
+  stateReceiver: StateReceiver;
 }
 
 interface RootFixture {
@@ -47,6 +63,36 @@ const overrides = {
   gasLimit: 9999999,
   gasPrice: 875000000,
 };
+
+export async function tunnelFixture([wallet]: Signer[]): Promise<TunnelFixture> {
+  
+  const fxChild = await new FxChild__factory(wallet).deploy(overrides);
+
+  const stateReceiver = await new StateReceiver__factory(wallet).deploy(fxChild.address, overrides);
+
+  const erc20Token = await new FxERC20__factory(wallet).deploy(overrides);
+  const erc20 = await new FxERC20ChildTunnel__factory(wallet).deploy(fxChild.address, erc20Token.address, overrides);
+  await erc20Token.initialize(await wallet.getAddress(), erc20.address, "FxERC20", "FE2", 18);
+
+  const erc721Token = await new FxERC721__factory(wallet).deploy(overrides);
+  const erc721 = await new FxERC721ChildTunnel__factory(wallet).deploy(fxChild.address, erc721Token.address, overrides);
+  await erc721Token.initialize(await wallet.getAddress(), erc721.address, "FxERC721", "FE7");
+
+  const erc1155Token = await new FxERC1155__factory(wallet).deploy(overrides);
+  const erc1155 = await new FxERC1155ChildTunnel__factory(wallet).deploy(fxChild.address, erc1155Token.address, overrides);
+  await erc1155Token.initialize(await wallet.getAddress(), erc1155.address, "https://");
+
+  return { 
+    fxChild,
+    erc20Token,
+    erc20,
+    erc721Token,
+    erc721,
+    erc1155Token,
+    erc1155,
+    stateReceiver
+  };
+}
 
 export async function childFixture([wallet]: Signer[]): Promise<ChildFixture> {
   
