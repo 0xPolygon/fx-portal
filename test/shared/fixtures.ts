@@ -39,6 +39,7 @@ interface ChildFixture {
   erc721: FxERC721ChildTunnel;
   erc1155Token: FxERC1155;
   erc1155: FxERC1155ChildTunnel;
+  stateReceiver: StateReceiver;
 }
 
 interface TunnelFixture {
@@ -57,6 +58,7 @@ interface RootFixture {
   erc20: FxERC20RootTunnel;
   erc721: FxERC721RootTunnel;
   erc1155: FxERC1155RootTunnel;
+  stateSender: StateSender;
 }
 
 const overrides = {
@@ -98,6 +100,8 @@ export async function childFixture([wallet]: Signer[]): Promise<ChildFixture> {
   
   const fxChild = await new FxChild__factory(wallet).deploy(overrides);
 
+  const stateReceiver = await new StateReceiver__factory(wallet).deploy(fxChild.address, overrides);
+
   const erc20Token = await new FxERC20__factory(wallet).deploy(overrides);
   const erc20 = await new FxERC20ChildTunnel__factory(wallet).deploy(fxChild.address, erc20Token.address, overrides);
   await erc20Token.initialize(await wallet.getAddress(), erc20.address, "FxERC20", "FE2", 18);
@@ -117,13 +121,15 @@ export async function childFixture([wallet]: Signer[]): Promise<ChildFixture> {
     erc721Token,
     erc721,
     erc1155Token,
-    erc1155
+    erc1155,
+    stateReceiver
   };
 }
 
 export async function rootFixture([wallet]: Signer[], cFixture: ChildFixture, ): Promise<RootFixture> {
   const checkpointManager: string = "0x600e7E2B520D51a7FE5e404E73Fb0D98bF2A913E";
-  const stateSender: string = "0x600e7E2B520D51a7FE5e404E73Fb0D98bF2A913E";
+  // const stateSender: string = "0x600e7E2B520D51a7FE5e404E73Fb0D98bF2A913E";
+
   // const fxERC20, fxERC721, fxERC1155;
 
   const { 
@@ -133,10 +139,13 @@ export async function rootFixture([wallet]: Signer[], cFixture: ChildFixture, ):
     erc721Token: fxERC721,
     erc721: fxERC721ChildTunnel,
     erc1155Token: fxERC1155,
-    erc1155: fxERC1155ChildTunnel
+    erc1155: fxERC1155ChildTunnel,
+    stateReceiver
   } = cFixture;
 
-  const fxRoot = await new FxRoot__factory(wallet).deploy(stateSender, overrides);
+  const stateSender = await new StateSender__factory(wallet).deploy(stateReceiver.address, overrides);
+
+  const fxRoot = await new FxRoot__factory(wallet).deploy(stateSender.address, overrides);
   await fxChild.setFxRoot(fxRoot.address);
   await fxRoot.setFxChild(fxChild.address);
 
@@ -145,6 +154,10 @@ export async function rootFixture([wallet]: Signer[], cFixture: ChildFixture, ):
   // console.log(setERC20Child)
   await setERC20Child.wait()
   console.log('ERC20ChildTunnel set')
+
+  const setERC20Root = await fxERC20ChildTunnel.setFxRootTunnel(erc20.address);
+  await setERC20Root.wait();
+  console.log('ERC20RootTunnel set');
 
   const erc721 = await new FxERC721RootTunnel__factory(wallet).deploy(checkpointManager, fxRoot.address, fxERC721.address, overrides);
   const setERC721Child = await erc721.setFxChildTunnel(fxERC721ChildTunnel.address)
@@ -162,6 +175,7 @@ export async function rootFixture([wallet]: Signer[], cFixture: ChildFixture, ):
     fxRoot, 
     erc20,
     erc721,
-    erc1155
+    erc1155,
+    stateSender
   };
 }

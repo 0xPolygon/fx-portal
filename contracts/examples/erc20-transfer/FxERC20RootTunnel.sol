@@ -45,7 +45,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // MAP_TOKEN, encode(rootToken, name, symbol, decimals)
         bytes memory message = abi.encode(MAP_TOKEN, abi.encode(rootToken, name, symbol, decimals));
-        console.logBytes(message);
+        // console.logBytes(message);
         _sendMessageToChild(message);
 
         // compute child token address before deployment using create2

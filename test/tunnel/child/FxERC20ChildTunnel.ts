@@ -72,16 +72,10 @@ describe('FxERC20', () => {
   it('fxChild, template', async () => {
     expect(await fxERC20ChildTunnel.fxChild()).to.eq(fxChild.address);
     expect(await fxERC20ChildTunnel.tokenTemplate()).to.eq(fxERC20.address);
-    expect(await fxERC20ChildTunnel.fxRootTunnel()).to.eq('0x0000000000000000000000000000000000000000');
+    expect(await fxERC20ChildTunnel.fxRootTunnel()).to.eq(fxERC20RootTunnel.address);
   });
 
-  it('set root tunnel: sucess', async () => {
-    await fxERC20ChildTunnel.setFxRootTunnel(fxERC20RootTunnel.address);
-    expect(await fxERC20ChildTunnel.fxRootTunnel()).to.eq(fxERC20RootTunnel.address);
-  })
-
   it('onStateRecieve map token: success', async () => {
-    await fxERC20ChildTunnel.setFxRootTunnel(fxERC20RootTunnel.address);
     const receiver = fxERC20ChildTunnel.address;
     const rootMessageSender = fxERC20RootTunnel.address;
     const syncType = ethers.utils.keccak256(ethers.utils.toUtf8Bytes("DEPOSIT"));

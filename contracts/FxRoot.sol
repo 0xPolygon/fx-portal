@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import "hardhat/console.sol";
 
 interface IStateSender {
     function syncState(address receiver, bytes calldata data) external;

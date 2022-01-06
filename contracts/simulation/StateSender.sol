@@ -13,8 +13,8 @@ interface IStateReceiver {
 contract StateSender {
 
     address stateReceiver;
-    constructor() {
-        
+    constructor(address _stateReceiver) {
+        stateReceiver = _stateReceiver;
     }
 
     function syncState(address receiver, bytes calldata data) external {
