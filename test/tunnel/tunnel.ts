@@ -13,6 +13,10 @@ import { FxERC1155ChildTunnel } from '../../types/FxERC1155ChildTunnel';
 import { rootFixture } from '../shared/fixtures';
 import { FxChild } from '../../types/FxChild';
 import { FxRoot } from '../../types/FxRoot';
+import { FxERC20RootTunnel } from '../../types/FxERC20RootTunnel';
+import { FxERC721RootTunnel } from '../../types/FxERC721RootTunnel';
+import { FxERC1155RootTunnel } from '../../types/FxERC1155RootTunnel';
+import { StateReceiver } from '../../types/StateReceiver';
 
 chai.use(solidity);
 
@@ -27,10 +31,14 @@ interface ChildFixture {
   erc721: FxERC721ChildTunnel;
   erc1155Token: FxERC1155;
   erc1155: FxERC1155ChildTunnel;
+  stateReceiver: StateReceiver;
 }
 
 interface RootFixture {
   fxRoot: FxRoot;
+  erc20: FxERC20RootTunnel;
+  erc721: FxERC721RootTunnel;
+  erc1155: FxERC1155RootTunnel;
 }
 
 describe('FxERC20', () => {
@@ -40,6 +48,7 @@ describe('FxERC20', () => {
   let fxERC20ChildTunnel: FxERC20ChildTunnel;
   let fxChild: FxChild;
   let fxRoot: FxRoot;
+  let fxERC20RootTunnel: FxERC20RootTunnel;
 
   beforeEach(async () => {
     const signers = await ethers.getSigners();
@@ -51,12 +60,25 @@ describe('FxERC20', () => {
     fxERC20ChildTunnel = cFixture.erc20;
     const rFixture: RootFixture = await rootFixture(signers, cFixture);
     fxRoot = rFixture.fxRoot;
+    fxERC20RootTunnel = rFixture.erc20;
 
     await fxERC20.mint(await wallet.getAddress(), TOTAL_SUPPLY);
   });
 
-  it('fxChild, fxRoot addresses', async () => {
-    expect(await fxChild.fxRoot()).to.eq(fxRoot.address);
-    expect(await fxRoot.fxChild()).to.eq(fxChild.address);
+  it('fxRoot, mapToken', async () => {
+    let childTokenMap = await fxERC20ChildTunnel.rootToChildToken(fxERC20.address);
+    let rootTokenMap = await fxERC20RootTunnel.rootToChildTokens(fxERC20.address);
+    expect(childTokenMap).to.eq(rootTokenMap);
+    expect(childTokenMap).to.eq("0x0000000000000000000000000000000000000000");
+
+    await expect(fxERC20RootTunnel.mapToken(fxERC20.address))
+      .to.emit(fxERC20RootTunnel, 'TokenMappedERC20')
+      .to.emit(fxERC20ChildTunnel, 'TokenMapped')
+      // .withArgs(fxERC20.address, await other.getAddress(), TEST_AMOUNT);
+
+    childTokenMap = await fxERC20ChildTunnel.rootToChildToken(fxERC20.address);
+    rootTokenMap = await fxERC20RootTunnel.rootToChildTokens(fxERC20.address);
+    expect(childTokenMap).to.eq(rootTokenMap);
+    expect(childTokenMap).to.not.eq("0x0000000000000000000000000000000000000000");
   });
 });
