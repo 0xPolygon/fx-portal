@@ -107,7 +107,7 @@ dist
 node_modules
 
 #Hardhat files
-types
+types/
 cache
 artifacts
 internal
