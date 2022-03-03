@@ -100,18 +100,6 @@ export async function getApprovalDigest(
 }
 
 export async function mineBlock(provider: typeof ethers.provider, timestamp: number): Promise<void> {
-  // await new Promise(async (resolve, reject) => {
-  //   (provider._web3Provider.sendAsync as any)(
-  //     { jsonrpc: '2.0', method: 'evm_mine', params: [timestamp] },
-  //     (error: any, result: any): void => {
-  //       if (error) {
-  //         reject(error);
-  //       } else {
-  //         resolve(result);
-  //       }
-  //     },
-  //   );
-  // });
   await provider.send('evm_setNextBlockTimestamp', [timestamp]);
 }
 

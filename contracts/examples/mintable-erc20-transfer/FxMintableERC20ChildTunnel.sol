@@ -61,7 +61,7 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
             childToken != address(0x0) &&
             rootToken != address(0x0) &&
             childToken == rootToChildToken[rootToken],
-            "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
+            "FxMintableERC20ChildTunnel: NO_MAPPED_TOKEN"
         );
         
         //mint token

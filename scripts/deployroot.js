@@ -43,7 +43,7 @@ async function main () {
   const setERC20Child = await erc20.setFxChildTunnel(fxERC20ChildTunnel)
   console.log(setERC20Child)
   await setERC20Child.wait()
-  console.log('ERC20ChildTunnel set')
+  // console.log('ERC20ChildTunnel set')
 
   const ERC721 = await hre.ethers.getContractFactory('FxERC721RootTunnel')
   const erc721 = await ERC721.deploy(checkpointManager, fxRoot, fxERC721)
@@ -55,7 +55,7 @@ async function main () {
   const setERC721Child = await erc721.setFxChildTunnel(fxERC721ChildTunnel)
   console.log(setERC721Child)
   await setERC721Child.wait()
-  console.log('ERC721ChildTunnel set')
+  // console.log('ERC721ChildTunnel set')
 
   const ERC1155 = await hre.ethers.getContractFactory('FxERC1155RootTunnel')
   const erc1155 = await ERC1155.deploy(checkpointManager, fxRoot, fxERC1155)
@@ -67,7 +67,7 @@ async function main () {
   const setERC1155Child = await erc1155.setFxChildTunnel(fxERC1155ChildTunnel)
   console.log(setERC1155Child)
   await setERC1155Child.wait()
-  console.log('ERC1155ChildTunnel set')
+  // console.log('ERC1155ChildTunnel set')
 }
 
 main()
