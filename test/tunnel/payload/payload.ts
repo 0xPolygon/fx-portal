@@ -63,8 +63,21 @@ function encodePayload_(
     );
 }
 
+function buildBlockProof(maticWeb3: any, startBlock: number, endBlock: number, blockNumber: number) {
+    return ProofUtil.getFastMerkleProof(
+        maticWeb3, blockNumber, startBlock, endBlock
+    ).then(proof => {
+        return ethUtils.bufferToHex(
+            Buffer.concat(
+                proof.map(p => {
+                    return ethUtils.toBuffer(p);
+                })
+            )
+        );
+    });
+}
+
 export async function buildPayloadForExit(burnTxHash: string, logEventSig: string, isFast: boolean) {
-    
     const requestConcurrency: number = 0;
     const block = await ethers.provider.getTransaction(burnTxHash);
     const receipt  = await ethers.provider.getTransactionReceipt(burnTxHash);
@@ -74,18 +87,14 @@ export async function buildPayloadForExit(burnTxHash: string, logEventSig: strin
       headerBlockNumber: 500
     }
 
-    const result: AxiosResponse = await axios.get(`https://apis.matic.network/api/v1/mumbai/fast-merkle-proof`, 
-      {params: {
-        start: rootBlockInfo.start,
-        end: rootBlockInfo.end,
-        number: rootBlockInfo.headerBlockNumber
-      }
-    });
-
-    const blockProof = result.data.proof;
+    const blockProof: any = await buildBlockProof(ethers.provider,
+        rootBlockInfo.start,
+        rootBlockInfo.end,
+        block.blockNumber as number
+    );
     console.log(blockProof);
     
-    const receiptProof = ProofUtil.getReceiptProof(
+    const receiptProof: any = await ProofUtil.getReceiptProof(
       receipt,
       block,
       requestConcurrency
@@ -96,16 +105,16 @@ export async function buildPayloadForExit(burnTxHash: string, logEventSig: strin
     );
 
     const txBlockNumber = block.blockNumber;
-    // encodePayload_(
-    //     rootBlockInfo.headerBlockNumber,
-    //     blockProof,
-    //     txBlockNumber,
-    //     block.timestamp,
-    //     Buffer.from(block.transactionsRoot.slice(2), 'hex'),
-    //     Buffer.from(block.receiptsRoot.slice(2), 'hex'),
-    //     ProofUtil.getReceiptBytes(receipt), // rlp encoded
-    //     receiptProof.parentNodes,
-    //     receiptProof.path,
-    //     logIndex
-    // )
+    return encodePayload_(
+        rootBlockInfo.headerBlockNumber,
+        blockProof,
+        txBlockNumber,
+        block.timestamp,
+        Buffer.from(blockProof.transactionsRoot.slice(2), 'hex'),
+        Buffer.from(blockProof.receiptsRoot.slice(2), 'hex'),
+        ProofUtil.getReceiptBytes(receipt), // rlp encoded
+        receiptProof.parentNodes,
+        receiptProof.path,
+        logIndex
+    );
 }
