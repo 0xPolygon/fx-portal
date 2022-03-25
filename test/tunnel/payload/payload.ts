@@ -79,8 +79,11 @@ function buildBlockProof(maticWeb3: any, startBlock: number, endBlock: number, b
 
 export async function buildPayloadForExit(burnTxHash: string, logEventSig: string, isFast: boolean) {
     const requestConcurrency: number = 0;
-    const block = await ethers.provider.getTransaction(burnTxHash);
-    const receipt  = await ethers.provider.getTransactionReceipt(burnTxHash);
+    const receipt = await ethers.provider.getTransactionReceipt(burnTxHash);
+    const block = await ethers.provider.send(
+        'eth_getBlockByNumber',
+        [ethers.utils.hexValue(receipt.blockNumber), true]
+    )
     const rootBlockInfo = {
       start: 0,
       end: 1000,
@@ -90,7 +93,7 @@ export async function buildPayloadForExit(burnTxHash: string, logEventSig: strin
     const blockProof: any = await buildBlockProof(ethers.provider,
         rootBlockInfo.start,
         rootBlockInfo.end,
-        block.blockNumber as number
+        block.number as number
     );
     console.log(blockProof);
     
@@ -104,14 +107,13 @@ export async function buildPayloadForExit(burnTxHash: string, logEventSig: strin
         logEventSig, receipt
     );
 
-    const txBlockNumber = block.blockNumber;
     return encodePayload_(
         rootBlockInfo.headerBlockNumber,
         blockProof,
-        txBlockNumber,
+        block.number,
         block.timestamp,
-        Buffer.from(blockProof.transactionsRoot.slice(2), 'hex'),
-        Buffer.from(blockProof.receiptsRoot.slice(2), 'hex'),
+        Buffer.from(block.transactionsRoot.slice(2), 'hex'),
+        Buffer.from(block.receiptsRoot.slice(2), 'hex'),
         ProofUtil.getReceiptBytes(receipt), // rlp encoded
         receiptProof.parentNodes,
         receiptProof.path,
