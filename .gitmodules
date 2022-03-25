@@ -1,0 +1,3 @@
+[submodule "test/imports/pos-portal"]
+	path = test/imports/pos-portal
+	url = https://github.com/maticnetwork/pos-portal
