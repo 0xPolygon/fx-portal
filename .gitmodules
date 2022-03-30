@@ -1,3 +1,6 @@
 [submodule "test/imports/pos-portal"]
 	path = test/imports/pos-portal
 	url = https://github.com/maticnetwork/pos-portal
+[submodule "test/imports/contracts"]
+	path = test/imports/contracts
+	url = git@github.com:maticnetwork/contracts.git
