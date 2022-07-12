@@ -182,8 +182,8 @@ library RLPReader {
 
     function toAddress(RLPItem memory item) internal pure returns (address) {
         // 1 byte for the length prefix
-        require(item.len == 21);
-
+        require(item.len <= 21);
+        
         return address(uint160(toUint(item)));
     }
 
