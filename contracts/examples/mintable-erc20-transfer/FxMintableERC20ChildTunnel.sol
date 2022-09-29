@@ -74,6 +74,14 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
     }
 
     function withdraw(address childToken, uint256 amount) public {
+        _withdraw(msg.sender, childToken, amount);
+    }
+
+    function withdrawTo(address receiver, address childToken, uint256 amount) public {
+        _withdraw(receiver, childToken, amount);
+    }
+
+    function _withdraw(address receiver, address childToken, uint256 amount) internal {
         FxERC20 childTokenContract = FxERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
@@ -95,7 +103,7 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         bytes memory metaData = abi.encode(name, symbol, decimals);
 
         // send message to root regarding token burn
-        _sendMessageToRoot(abi.encode(rootToken, childToken, msg.sender, amount, metaData));
+        _sendMessageToRoot(abi.encode(rootToken, childToken, receiver, amount, metaData));
     }
 
     //
