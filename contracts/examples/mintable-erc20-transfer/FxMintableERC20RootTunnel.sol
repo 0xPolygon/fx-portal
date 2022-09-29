@@ -21,6 +21,19 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
     mapping(address => address) public rootToChildTokens;
     address public rootTokenTemplate;
 
+    event FxWithdrawMintableERC20(
+        address indexed rootToken,
+        address indexed childToken,
+        address indexed userAddress,
+        uint256 amount
+    );
+    event FxDepositMintableERC20(
+        address indexed rootToken,
+        address indexed depositor,
+        address indexed userAddress,
+        uint256 amount
+    );
+
     constructor(
         address _checkpointManager,
         address _fxRoot,
@@ -48,6 +61,8 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         // DEPOSIT, encode(rootToken, depositor, user, amount, extra data)
         bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, amount, data));
         _sendMessageToChild(message);
+
+        emit FxDepositMintableERC20(rootToken, msg.sender, user, amount);
     }
 
     // exit processor
@@ -81,6 +96,8 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // transfer from tokens
         IERC20(rootToken).safeTransferFrom(address(this), to, amount);
+
+        emit FxWithdrawMintableERC20(rootToken, childToken, to, amount);
     }
 
     function _deployRootToken(
