@@ -93,7 +93,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
-        FxERC20(rootToken).initialize(address(this), rootToken, name, symbol, decimals);
+        FxERC20(rootToken).initialize(address(this), childToken, name, symbol, decimals);
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
