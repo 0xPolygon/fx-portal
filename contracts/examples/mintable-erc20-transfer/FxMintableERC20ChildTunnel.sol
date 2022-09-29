@@ -77,11 +77,19 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         _withdraw(msg.sender, childToken, amount);
     }
 
-    function withdrawTo(address receiver, address childToken, uint256 amount) public {
+    function withdrawTo(
+        address receiver,
+        address childToken,
+        uint256 amount
+    ) public {
         _withdraw(receiver, childToken, amount);
     }
 
-    function _withdraw(address receiver, address childToken, uint256 amount) internal {
+    function _withdraw(
+        address receiver,
+        address childToken,
+        uint256 amount
+    ) internal {
         FxERC20 childTokenContract = FxERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
