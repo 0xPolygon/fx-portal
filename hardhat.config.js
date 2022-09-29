@@ -16,7 +16,7 @@ if (process.env.PRIVATE_KEY) {
 
 module.exports = {
   solidity: {
-    version: "0.8.0",
+    version: "0.8.17",
     settings: {
       optimizer: {
         enabled: true,
