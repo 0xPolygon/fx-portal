@@ -29,7 +29,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     );
 
     mapping(address => address) public rootToChildTokens;
-    bytes32 public childTokenTemplateCodeHash;
+    bytes32 public immutable childTokenTemplateCodeHash;
 
     constructor(
         address _checkpointManager,
