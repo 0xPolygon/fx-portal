@@ -168,7 +168,7 @@ library RLPReader {
         return result;
     }
 
-    // any non-zero byte is considered true
+    // any non-zero byte < 128 is considered true
     function toBoolean(RLPItem memory item) internal pure returns (bool) {
         require(item.len == 1);
         uint256 result;
