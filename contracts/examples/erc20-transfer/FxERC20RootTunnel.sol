@@ -42,7 +42,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
     }
 
     /**
-     * @notice Map a token to enable its movement via the PoS Portal, callable only by mappers
+     * @notice Map a token to enable its movement via the PoS Portal, callable by everyone
      * @param rootToken address of token on root chain
      */
     function mapToken(address rootToken) public {
