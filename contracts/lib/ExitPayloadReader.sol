@@ -44,7 +44,7 @@ library ExitPayloadReader {
             src += WORD_SIZE;
             dest += WORD_SIZE;
         }
-        
+
         if (len == 0) return;
 
         // left over bytes. Mask is used to remove unwanted bytes from the word
