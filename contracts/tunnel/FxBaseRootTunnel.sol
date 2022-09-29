@@ -133,7 +133,7 @@ abstract contract FxBaseRootTunnel {
         bytes32 receiptRoot,
         uint256 headerNumber,
         bytes memory blockProof
-    ) private view returns (uint256) {
+    ) private view {
         (bytes32 headerRoot, uint256 startBlock, , uint256 createdAt, ) = checkpointManager.headerBlocks(headerNumber);
 
         require(
@@ -144,7 +144,6 @@ abstract contract FxBaseRootTunnel {
             ),
             "FxRootTunnel: INVALID_HEADER"
         );
-        return createdAt;
     }
 
     /**
