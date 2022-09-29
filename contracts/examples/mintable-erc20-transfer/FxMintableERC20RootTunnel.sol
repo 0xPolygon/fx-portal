@@ -20,7 +20,6 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
     mapping(address => address) public rootToChildTokens;
     address public rootTokenTemplate;
-    bytes32 public childTokenTemplateCodeHash;
 
     constructor(
         address _checkpointManager,
