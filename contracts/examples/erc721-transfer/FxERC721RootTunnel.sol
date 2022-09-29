@@ -50,7 +50,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     }
 
     /**
-     * @notice Map a token to enable its movement via the PoS Portal, callable only by mappers
+     * @notice Map a token to enable its movement via the PoS Portal, callable by anyone
      * @param rootToken address of token on root chain
      */
     function mapToken(address rootToken) public {
