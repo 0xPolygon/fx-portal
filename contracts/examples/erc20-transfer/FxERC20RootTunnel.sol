@@ -30,7 +30,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
     );
 
     mapping(address => address) public rootToChildTokens;
-    bytes32 public childTokenTemplateCodeHash;
+    bytes32 public immutable childTokenTemplateCodeHash;
 
     constructor(
         address _checkpointManager,
