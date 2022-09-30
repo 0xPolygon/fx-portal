@@ -15,7 +15,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
     string public constant SUFFIX_NAME = " (FXERC721)";
     string public constant PREFIX_SYMBOL = "fx";
 
-    // event for token maping
+    // event for token mapping
     event TokenMapped(address indexed rootToken, address indexed childToken);
     // root to child token
     mapping(address => address) public rootToChildToken;

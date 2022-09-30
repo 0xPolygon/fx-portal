@@ -26,7 +26,7 @@ contract FxERC20 is IFxERC20, ERC20 {
         setupMetaData(name_, symbol_, decimals_);
     }
 
-    // fxManager rturns fx manager
+    // fxManager returns fx manager
     function fxManager() public view override returns (address) {
         return _fxManager;
     }

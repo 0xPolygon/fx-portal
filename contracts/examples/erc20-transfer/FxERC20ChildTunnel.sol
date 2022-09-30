@@ -14,7 +14,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     string public constant SUFFIX_NAME = " (FXERC20)";
     string public constant PREFIX_SYMBOL = "fx";
 
-    // event for token maping
+    // event for token mapping
     event TokenMapped(address indexed rootToken, address indexed childToken);
     // root to child token
     mapping(address => address) public rootToChildToken;
@@ -101,7 +101,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         IFxERC20 childTokenContract = IFxERC20(childToken);
         childTokenContract.mint(to, amount);
 
-        // call `onTokenTranfer` on `to` with limit and ignore error
+        // call onTokenTransfer() on `to` with limit and ignore error
         if (_isContract(to)) {
             uint256 txGas = 2000000;
             bool success = false;

@@ -13,13 +13,13 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     //bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
-    // event for token maping
+    // event for token mapping
     event TokenMapped(address indexed rootToken, address indexed childToken);
     // root to child token
     mapping(address => address) public rootToChildToken;
     // child token template
     address public childTokenTemplate;
-    // root token tempalte code hash
+    // root token template code hash
     bytes32 public rootTokenTemplateCodeHash;
 
     constructor(
