@@ -17,7 +17,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
     //bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
     mapping(address => address) public rootToChildTokens;
-    address public rootTokenTemplate;
+    address public immutable rootTokenTemplate;
 
     event FxWithdrawMintableERC20(
         address indexed rootToken,
