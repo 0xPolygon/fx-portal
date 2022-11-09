@@ -54,8 +54,8 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
     // deploy child token with unique id
     function deployChildToken(
         uint256 _uniqueId,
-        string memory _name,
-        string memory _symbol
+        string calldata _name,
+        string calldata _symbol
     ) external onlyOwner {
         // deploy new child token using unique id
         address childToken = createClone(keccak256(abi.encodePacked(_uniqueId)), childTokenTemplate); // childSalt, childTokenTemplate
@@ -85,7 +85,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
     function mintToken(
         address _childToken,
         uint256 _tokenId,
-        bytes memory _data
+        bytes calldata _data
     ) external onlyOwner {
         FxERC721 childTokenContract = FxERC721(_childToken);
         // child token contract will have root token
@@ -102,7 +102,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
     function withdraw(
         address childToken,
         uint256 tokenId,
-        bytes memory data
+        bytes calldata data
     ) external {
         _withdraw(childToken, msg.sender, tokenId, data);
     }
@@ -111,7 +111,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         address childToken,
         address receiver,
         uint256 tokenId,
-        bytes memory data
+        bytes calldata data
     ) external {
         _withdraw(childToken, receiver, tokenId, data);
     }
@@ -161,7 +161,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         address childToken,
         address receiver,
         uint256 tokenId,
-        bytes memory data
+        bytes calldata data
     ) internal {
         FxERC721 childTokenContract = FxERC721(childToken);
         // child token contract will have root token

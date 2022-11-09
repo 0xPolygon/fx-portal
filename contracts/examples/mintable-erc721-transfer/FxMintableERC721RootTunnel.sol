@@ -46,7 +46,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         address rootToken,
         address user,
         uint256 tokenId,
-        bytes memory data
+        bytes calldata data
     ) external {
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC721RootTunnel: NO_MAPPING_FOUND");
 

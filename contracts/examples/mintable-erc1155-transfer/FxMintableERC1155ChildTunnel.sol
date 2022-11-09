@@ -69,7 +69,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
     //
 
     // deploy child token with unique id
-    function deployChildToken(uint256 _uniqueId, string memory _uri) external {
+    function deployChildToken(uint256 _uniqueId, string calldata _uri) external {
         // deploy new child token using unique id
         address childToken = createClone(keccak256(abi.encodePacked(_uniqueId)), childTokenTemplate); // child salt, childTokenTemplate
 

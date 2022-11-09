@@ -80,7 +80,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         address user,
         uint256 id,
         uint256 amount,
-        bytes memory data
+        bytes calldata data
     ) public {
         // map token if not mapped
         if (rootToChildTokens[rootToken] == address(0x0)) {
@@ -104,9 +104,9 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     function depositBatch(
         address rootToken,
         address user,
-        uint256[] memory ids,
-        uint256[] memory amounts,
-        bytes memory data
+        uint256[] calldata ids,
+        uint256[] calldata amounts,
+        bytes calldata data
     ) public {
         // map token if not mapped
         if (rootToChildTokens[rootToken] == address(0x0)) {
