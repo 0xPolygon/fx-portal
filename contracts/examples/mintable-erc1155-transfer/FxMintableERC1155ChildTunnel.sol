@@ -69,7 +69,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
     //
 
     // deploy child token with unique id
-    function deployChildToken(uint256 _uniqueId, string memory _uri) external onlyOwner {
+    function deployChildToken(uint256 _uniqueId, string memory _uri) external {
         // deploy new child token using unique id
         bytes32 childSalt = keccak256(abi.encodePacked(_uniqueId));
         address childToken = createClone(childSalt, childTokenTemplate);
@@ -93,7 +93,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         uint256 _tokenId,
         uint256 _amount,
         bytes calldata _data
-    ) external onlyOwner {
+    ) external {
         FxERC1155 childTokenContract = FxERC1155(_childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
@@ -227,11 +227,6 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             "FxMintableERC1155ChildTunnel: NO_MAPPED_TOKEN"
         );
 
-        require(
-            childTokenContract.balanceOf(msg.sender, id) >= amount,
-            "FxMintableERC1155ChildTunnel: INSUFFICIENT_BALANCE"
-        );
-
         childTokenContract.burn(msg.sender, id, amount);
         emit FxWithdrawMintableERC1155(rootToken, childToken, receiver, id, amount);
 
@@ -259,7 +254,6 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             childToken != address(0x0) && rootToken != address(0x0) && childToken == rootToChildToken[rootToken],
             "FxMintableERC1155ChildTunnel: NO_MAPPED_TOKEN"
         );
-        require(ids.length == amounts.length, "FxMintableERC1155ChildTunnel: LENGTH_MIS_MATCH");
 
         FxERC1155 rootTokenContract = FxERC1155(childToken);
         bytes memory metadata;
