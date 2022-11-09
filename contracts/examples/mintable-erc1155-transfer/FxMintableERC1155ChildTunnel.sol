@@ -241,7 +241,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             uint256 length = ids.length;
             string[] memory uris = new string[](length);
 
-            for (uint256 i; i < length; ) {
+            for (uint256 i = 0; i < length; ) {
                 uris[i] = rootTokenContract.uri(ids[i]);
                 unchecked {
                     ++i;
