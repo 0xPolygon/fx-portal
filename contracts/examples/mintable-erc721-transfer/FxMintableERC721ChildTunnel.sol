@@ -177,13 +177,12 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         childTokenContract.burn(tokenId);
         emit FxWithdrawMintableERC721(rootToken, childToken, receiver, tokenId);
 
-        // ! note: figure out if this metadata is required: if not switch to IFxERC721 or add name and symbol in the interface: https://github.com/ethereum/solidity/issues/13349
         FxERC721 rootTokenContract = FxERC721(childToken);
         string memory name = rootTokenContract.name();
         string memory symbol = rootTokenContract.symbol();
-        bytes memory metaData = abi.encode(name, symbol);
+        bytes memory metadata = abi.encode(name, symbol);
 
         // send message to root regarding token burn
-        _sendMessageToRoot(abi.encode(rootToken, childToken, receiver, tokenId, data, metaData));
+        _sendMessageToRoot(abi.encode(rootToken, childToken, receiver, tokenId, data, metadata));
     }
 }
