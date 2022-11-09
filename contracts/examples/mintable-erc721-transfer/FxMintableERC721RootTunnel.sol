@@ -59,8 +59,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         );
 
         // DEPOSIT, encode(rootToken, depositor, user, tokenId, extra data)
-        bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, data));
-        _sendMessageToChild(message);
+        _sendMessageToChild(abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, data)));
         emit FxDepositMintableERC721(rootToken, msg.sender, user, tokenId);
     }
 
@@ -98,7 +97,6 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC721RootTunnel: INVALID_MAPPING_ON_EXIT");
 
         // check if current token has been minted on root chain
-        // ! for 1155: check amount here
         FxERC721 nft = FxERC721(rootToken);
         address currentOwner = nft.ownerOf(tokenId);
         if (currentOwner == address(0)) {
