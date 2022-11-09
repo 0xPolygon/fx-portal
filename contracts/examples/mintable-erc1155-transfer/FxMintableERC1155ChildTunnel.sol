@@ -14,28 +14,28 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
     bytes32 public constant WITHDRAW_BATCH = keccak256("WITHDRAW_BATCH");
 
     event TokenMapped(address indexed rootToken, address indexed childToken);
-    event FxWithdrawERC1155(
+    event FxWithdrawMintableERC1155(
         address indexed rootToken,
         address indexed childToken,
         address indexed userAddress,
         uint256 id,
         uint256 amount
     );
-    event FxDepositERC1155(
+    event FxDepositMintableERC1155(
         address indexed rootToken,
         address indexed depositor,
         address indexed userAddress,
         uint256 id,
         uint256 amount
     );
-    event FxBatchWithdrawERC1155(
+    event FxBatchWithdrawMintableERC1155(
         address indexed rootToken,
         address indexed childToken,
         address indexed userAddress,
         uint256[] ids,
         uint256[] amounts
     );
-    event FxBatchDepositERC1155(
+    event FxBatchDepositMintableERC1155(
         address indexed rootToken,
         address indexed depositor,
         address indexed userAddress,
@@ -188,7 +188,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         FxERC1155 childTokenContract = FxERC1155(childToken);
 
         childTokenContract.mint(to, tokenId, amount, data);
-        emit FxDepositERC1155(rootToken, depositor, to, tokenId, amount);
+        emit FxDepositMintableERC1155(rootToken, depositor, to, tokenId, amount);
     }
 
     function _syncDepositBatch(bytes memory syncData) internal {
@@ -205,7 +205,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         FxERC1155 childTokenContract = FxERC1155(childToken);
 
         childTokenContract.mintBatch(to, tokenIds, amounts, data);
-        emit FxBatchDepositERC1155(rootToken, depositor, to, tokenIds, amounts);
+        emit FxBatchDepositMintableERC1155(rootToken, depositor, to, tokenIds, amounts);
     }
 
     function _withdraw(
@@ -229,7 +229,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         );
 
         childTokenContract.burn(msg.sender, id, amount);
-        emit FxWithdrawERC1155(rootToken, childToken, receiver, id, amount);
+        emit FxWithdrawMintableERC1155(rootToken, childToken, receiver, id, amount);
 
         FxERC1155 rootTokenContract = FxERC1155(childToken);
         bytes memory metaData = abi.encode(rootTokenContract.uri(id));
@@ -271,7 +271,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             }
 
             childTokenContract.burnBatch(msg.sender, ids, amounts);
-            emit FxBatchWithdrawERC1155(rootToken, childToken, receiver, ids, amounts);
+            emit FxBatchWithdrawMintableERC1155(rootToken, childToken, receiver, ids, amounts);
 
             metaData = abi.encode(uris);
         }
