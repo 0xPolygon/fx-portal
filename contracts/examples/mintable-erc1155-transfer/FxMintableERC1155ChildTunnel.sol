@@ -236,11 +236,11 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         emit FxWithdrawMintableERC1155(rootToken, childToken, receiver, id, amount);
 
         FxERC1155 rootTokenContract = FxERC1155(childToken);
-        bytes memory metaData = abi.encode(rootTokenContract.uri(id));
+        bytes memory metadata = abi.encode(rootTokenContract.uri(id));
 
         bytes memory message = abi.encode(
             WITHDRAW,
-            abi.encode(rootToken, childToken, receiver, id, amount, data, metaData)
+            abi.encode(rootToken, childToken, receiver, id, amount, data, metadata)
         );
         _sendMessageToRoot(message);
     }
@@ -262,7 +262,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         require(ids.length == amounts.length, "FxMintableERC1155ChildTunnel: LENGTH_MIS_MATCH");
 
         FxERC1155 rootTokenContract = FxERC1155(childToken);
-        bytes memory metaData;
+        bytes memory metadata;
         {
             uint256 length = ids.length;
             string[] memory uris = new string[](length);
@@ -277,12 +277,12 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             childTokenContract.burnBatch(msg.sender, ids, amounts);
             emit FxBatchWithdrawMintableERC1155(rootToken, childToken, receiver, ids, amounts);
 
-            metaData = abi.encode(uris);
+            metadata = abi.encode(uris);
         }
 
         bytes memory message = abi.encode(
             WITHDRAW_BATCH,
-            abi.encode(rootToken, childToken, receiver, ids, amounts, data, metaData)
+            abi.encode(rootToken, childToken, receiver, ids, amounts, data, metadata)
         );
         _sendMessageToRoot(message);
     }

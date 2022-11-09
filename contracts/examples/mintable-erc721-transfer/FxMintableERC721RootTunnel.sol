@@ -85,11 +85,11 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
             address to,
             uint256 tokenId,
             bytes memory syncData,
-            bytes memory metaData
+            bytes memory metadata
         ) = abi.decode(data, (address, address, address, uint256, bytes, bytes));
         // if root token is not available, create it
         if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
-            (string memory name, string memory symbol) = abi.decode(metaData, (string, string));
+            (string memory name, string memory symbol) = abi.decode(metadata, (string, string));
             address _createdToken = _deployRootToken(childToken, name, symbol);
             require(_createdToken == rootToken, "FxMintableERC721RootTunnel: ROOT_TOKEN_CREATION_MISMATCH");
         }
