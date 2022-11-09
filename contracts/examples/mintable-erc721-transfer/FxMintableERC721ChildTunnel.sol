@@ -6,6 +6,7 @@ import {Create2} from "../../lib/Create2.sol";
 import {FxERC721} from "../../tokens/FxERC721.sol";
 import {IERC721Receiver} from "../../lib/IERC721Receiver.sol";
 import {Ownable} from "../../lib/Ownable.sol";
+import {Address} from "../../lib/Address.sol";
 
 /**
  * @title FxMintableERC721ChildTunnel
@@ -41,7 +42,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         address _rootTokenTemplate
     ) FxBaseChildTunnel(_fxChild) {
         childTokenTemplate = _childTokenTemplate;
-        require(_isContract(_childTokenTemplate), "FxMintableERC721ChildTunnel: Token template is not contract");
+        require(Address.isContract(_childTokenTemplate), "FxMintableERC721ChildTunnel: Token template is not contract");
         // compute root token template code hash
         rootTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_rootTokenTemplate));
     }
@@ -184,14 +185,5 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
 
         // send message to root regarding token burn
         _sendMessageToRoot(abi.encode(rootToken, childToken, receiver, tokenId, data, metaData));
-    }
-
-    // check if address is contract
-    function _isContract(address _addr) private view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_addr)
-        }
-        return (size > 0);
     }
 }

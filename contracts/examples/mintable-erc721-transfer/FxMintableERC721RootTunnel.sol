@@ -5,6 +5,7 @@ import {FxERC721} from "../../tokens/FxERC721.sol";
 import {Create2} from "../../lib/Create2.sol";
 import {FxBaseRootTunnel} from "../../tunnel/FxBaseRootTunnel.sol";
 import {IERC721Receiver} from "../../lib/IERC721Receiver.sol";
+import {Address} from "../../lib/Address.sol";
 
 /**
  * @title FxMintableERC721RootTunnel
@@ -87,7 +88,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
             bytes memory metaData
         ) = abi.decode(data, (address, address, address, uint256, bytes, bytes));
         // if root token is not available, create it
-        if (!_isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
+        if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
             (string memory name, string memory symbol) = abi.decode(metaData, (string, string));
             address _createdToken = _deployRootToken(childToken, name, symbol);
             require(_createdToken == rootToken, "FxMintableERC721RootTunnel: ROOT_TOKEN_CREATION_MISMATCH");
@@ -124,14 +125,5 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         emit TokenMapped(rootToken, childToken);
 
         return rootToken;
-    }
-
-    // check if address is contract
-    function _isContract(address _addr) private view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_addr)
-        }
-        return (size > 0);
     }
 }

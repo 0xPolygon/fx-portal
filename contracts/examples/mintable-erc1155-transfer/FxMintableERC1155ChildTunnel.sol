@@ -6,6 +6,7 @@ import {ERC1155Holder} from "../../lib/ERC1155Holder.sol";
 import {Create2} from "../../lib/Create2.sol";
 import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 import {Ownable} from "../../lib/Ownable.sol";
+import {Address} from "../../lib/Address.sol";
 
 contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder, Ownable {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
@@ -55,7 +56,10 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         address _rootTokenTemplate
     ) FxBaseChildTunnel(_fxChild) {
         childTokenTemplate = _childTokenTemplate;
-        require(_isContract(_childTokenTemplate), "FxMintableERC1155ChildTunnel: Token template is not contract");
+        require(
+            Address.isContract(_childTokenTemplate),
+            "FxMintableERC1155ChildTunnel: Token template is not contract"
+        );
         // compute root token template code hash
         rootTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_rootTokenTemplate));
     }
@@ -281,13 +285,5 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             abi.encode(rootToken, childToken, receiver, ids, amounts, data, metaData)
         );
         _sendMessageToRoot(message);
-    }
-
-    function _isContract(address _addr) private view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_addr)
-        }
-        return (size > 0);
     }
 }
