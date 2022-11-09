@@ -13,13 +13,13 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
 
     event TokenMapped(address indexed rootToken, address indexed childToken);
-    event FxWithdrawERC721(
+    event FxWithdrawMintableERC721(
         address indexed rootToken,
         address indexed childToken,
         address indexed userAddress,
         uint256 id
     );
-    event FxDepositERC721(
+    event FxDepositMintableERC721(
         address indexed rootToken,
         address indexed depositor,
         address indexed userAddress,
@@ -60,7 +60,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         // DEPOSIT, encode(rootToken, depositor, user, tokenId, extra data)
         bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, tokenId, data));
         _sendMessageToChild(message);
-        emit FxDepositERC721(rootToken, msg.sender, user, tokenId);
+        emit FxDepositMintableERC721(rootToken, msg.sender, user, tokenId);
     }
 
     function onERC721Received(
@@ -106,7 +106,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
 
         // transfer from tokens to
         FxERC721(rootToken).safeTransferFrom(address(this), to, tokenId, syncData);
-        emit FxWithdrawERC721(rootToken, childToken, to, tokenId);
+        emit FxWithdrawMintableERC721(rootToken, childToken, to, tokenId);
     }
 
     function _deployRootToken(

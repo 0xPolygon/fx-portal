@@ -17,13 +17,13 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
     string public constant PREFIX_SYMBOL = "fx";
 
     event TokenMapped(address indexed rootToken, address indexed childToken);
-    event FxWithdrawERC721(
+    event FxWithdrawMintableERC721(
         address indexed rootToken,
         address indexed childToken,
         address indexed userAddress,
         uint256 id
     );
-    event FxDepositERC721(
+    event FxDepositMintableERC721(
         address indexed rootToken,
         address indexed depositor,
         address indexed userAddress,
@@ -151,9 +151,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         // deposit tokens
         FxERC721 childTokenContract = FxERC721(childToken);
         childTokenContract.mint(to, tokenId, depositData);
-        emit FxDepositERC721(rootToken, depositor, to, tokenId);
-
-        // ! call `onTokenTranfer` on `to` with limit and ignore error ?
+        emit FxDepositMintableERC721(rootToken, depositor, to, tokenId);
     }
 
     function _withdraw(
@@ -176,7 +174,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
 
         // withdraw tokens
         childTokenContract.burn(tokenId);
-        emit FxWithdrawERC721(rootToken, childToken, receiver, tokenId);
+        emit FxWithdrawMintableERC721(rootToken, childToken, receiver, tokenId);
 
         // ! note: figure out if this metadata is required: if not switch to IFxERC721 or add name and symbol in the interface: https://github.com/ethereum/solidity/issues/13349
         FxERC721 rootTokenContract = FxERC721(childToken);
