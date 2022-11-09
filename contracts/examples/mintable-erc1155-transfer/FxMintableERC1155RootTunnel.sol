@@ -64,8 +64,11 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         _sendMessageToChild(message);
 
         // compute child token address before deployment using create2
-        bytes32 salt = keccak256(abi.encodePacked(rootToken));
-        address childToken = computedCreate2Address(salt, childTokenTemplateCodeHash, fxChildTunnel);
+        address childToken = computedCreate2Address(
+            keccak256(abi.encodePacked(rootToken)), // childSalt
+            childTokenTemplateCodeHash,
+            fxChildTunnel
+        );
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
@@ -94,8 +97,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         );
 
         // DEPOSIT, encode(rootToken, depositor, user, id, amount, extra data)
-        bytes memory message = abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, id, amount, data));
-        _sendMessageToChild(message);
+        _sendMessageToChild(abi.encode(DEPOSIT, abi.encode(rootToken, msg.sender, user, id, amount, data)));
         emit FxDepositMintableERC1155(rootToken, msg.sender, user, id, amount);
     }
 
@@ -121,8 +123,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         );
 
         // DEPOSIT_BATCH, encode(rootToken, depositor, user, id, amount, extra data)
-        bytes memory message = abi.encode(DEPOSIT_BATCH, abi.encode(rootToken, msg.sender, user, ids, amounts, data));
-        _sendMessageToChild(message);
+        _sendMessageToChild(abi.encode(DEPOSIT_BATCH, abi.encode(rootToken, msg.sender, user, ids, amounts, data)));
         emit FxDepositBatchMintableERC1155(rootToken, user, ids, amounts);
     }
 

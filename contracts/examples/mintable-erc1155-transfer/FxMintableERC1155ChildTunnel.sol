@@ -71,12 +71,14 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
     // deploy child token with unique id
     function deployChildToken(uint256 _uniqueId, string memory _uri) external {
         // deploy new child token using unique id
-        bytes32 childSalt = keccak256(abi.encodePacked(_uniqueId));
-        address childToken = createClone(childSalt, childTokenTemplate);
+        address childToken = createClone(keccak256(abi.encodePacked(_uniqueId)), childTokenTemplate); // child salt, childTokenTemplate
 
         // compute root token address before deployment using create2
-        bytes32 rootSalt = keccak256(abi.encodePacked(childToken));
-        address rootToken = computedCreate2Address(rootSalt, rootTokenTemplateCodeHash, fxRootTunnel);
+        address rootToken = computedCreate2Address(
+            keccak256(abi.encodePacked(childToken)), // root salt
+            rootTokenTemplateCodeHash,
+            fxRootTunnel
+        );
 
         // check if mapping is already there
         require(rootToChildToken[rootToken] == address(0x0), "FxMintableERC1155ChildTunnel: ALREADY_MAPPED");
@@ -233,11 +235,9 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         FxERC1155 rootTokenContract = FxERC1155(childToken);
         bytes memory metadata = abi.encode(rootTokenContract.uri(id));
 
-        bytes memory message = abi.encode(
-            WITHDRAW,
-            abi.encode(rootToken, childToken, receiver, id, amount, data, metadata)
+        _sendMessageToRoot(
+            abi.encode(WITHDRAW, abi.encode(rootToken, childToken, receiver, id, amount, data, metadata))
         );
-        _sendMessageToRoot(message);
     }
 
     function _withdrawBatch(
@@ -274,10 +274,8 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             metadata = abi.encode(uris);
         }
 
-        bytes memory message = abi.encode(
-            WITHDRAW_BATCH,
-            abi.encode(rootToken, childToken, receiver, ids, amounts, data, metadata)
+        _sendMessageToRoot(
+            abi.encode(WITHDRAW_BATCH, abi.encode(rootToken, childToken, receiver, ids, amounts, data, metadata))
         );
-        _sendMessageToRoot(message);
     }
 }
