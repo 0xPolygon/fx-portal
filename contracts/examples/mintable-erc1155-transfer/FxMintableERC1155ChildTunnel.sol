@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import {FxERC1155} from "../../tokens/FxERC1155.sol";
-import {ERC1155Holder} from "../../lib/ERC1155Holder.sol";
-import {Create2} from "../../lib/Create2.sol";
 import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 import {Ownable} from "../../lib/Ownable.sol";
 import {Address} from "../../lib/Address.sol";
+import {ERC1155Holder} from "../../lib/ERC1155Holder.sol";
+import {Create2} from "../../lib/Create2.sol";
 
 contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder, Ownable {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
@@ -144,26 +144,6 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         bytes calldata data
     ) public {
         _withdrawBatch(childToken, receiver, ids, amounts, data);
-    }
-
-    function onERC1155Received(
-        address, /* operator */
-        address, /* from */
-        uint256, /* tokenId */
-        uint256, /* amount */
-        bytes memory /* data */
-    ) public pure override returns (bytes4) {
-        return this.onERC1155Received.selector;
-    }
-
-    function onERC1155BatchReceived(
-        address, /* operator */
-        address, /* from */
-        uint256[] memory, /* tokenIds */
-        uint256[] memory, /* amounts */
-        bytes memory /* data */
-    ) public pure override returns (bytes4) {
-        return this.onERC1155BatchReceived.selector;
     }
 
     //
