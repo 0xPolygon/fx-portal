@@ -13,7 +13,7 @@ import {Address} from "../../lib/Address.sol";
 contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
 
-    event TokenMapped(address indexed rootToken, address indexed childToken);
+    event TokenMappedMintableERC721(address indexed rootToken, address indexed childToken);
     event FxWithdrawMintableERC721(
         address indexed rootToken,
         address indexed childToken,
@@ -120,7 +120,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
-        emit TokenMapped(rootToken, childToken);
+        emit TokenMappedMintableERC721(rootToken, childToken);
 
         return rootToken;
     }
