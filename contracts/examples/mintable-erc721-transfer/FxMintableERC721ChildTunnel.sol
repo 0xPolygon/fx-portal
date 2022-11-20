@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 import {Create2} from "../../lib/Create2.sol";
-import {FxERC721} from "../../tokens/FxERC721.sol";
+import {FxMintableERC721} from "../../tokens/FxMintableERC721.sol";
 import {IERC721Receiver} from "../../lib/IERC721Receiver.sol";
 import {Ownable} from "../../lib/Ownable.sol";
 import {Address} from "../../lib/Address.sol";
@@ -73,30 +73,13 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         emit TokenMapped(rootToken, childToken);
 
         // initialize child token with all parameters
-        FxERC721(childToken).initialize(
+        FxMintableERC721(childToken).initialize(
             address(this),
             rootToken,
             string(abi.encodePacked(_name, SUFFIX_NAME)),
-            string(abi.encodePacked(PREFIX_SYMBOL, _symbol))
+            string(abi.encodePacked(PREFIX_SYMBOL, _symbol)),
+            msg.sender
         );
-    }
-
-    // Mint tokens on child chain
-    function mintToken(
-        address _childToken,
-        uint256 _tokenId,
-        bytes calldata _data
-    ) external onlyOwner {
-        FxERC721 childTokenContract = FxERC721(_childToken);
-        // child token contract will have root token
-        address rootToken = childTokenContract.connectedToken();
-
-        // validate root and child token mapping
-        require(
-            _childToken != address(0x0) && rootToken != address(0x0) && _childToken == rootToChildToken[rootToken],
-            "FxMintableERC721ChildTunnel: NO_MAPPED_TOKEN"
-        );
-        childTokenContract.mint(msg.sender, _tokenId, _data);
     }
 
     function withdraw(
@@ -152,8 +135,8 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         address childToken = rootToChildToken[rootToken];
 
         // deposit tokens
-        FxERC721 childTokenContract = FxERC721(childToken);
-        childTokenContract.mint(to, tokenId, depositData);
+        FxMintableERC721 childTokenContract = FxMintableERC721(childToken);
+        childTokenContract.mintToken(to, tokenId, depositData);
         emit FxDepositMintableERC721(rootToken, depositor, to, tokenId);
     }
 
@@ -163,7 +146,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         uint256 tokenId,
         bytes calldata data
     ) internal {
-        FxERC721 childTokenContract = FxERC721(childToken);
+        FxMintableERC721 childTokenContract = FxMintableERC721(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
 
@@ -179,7 +162,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         childTokenContract.burn(tokenId);
         emit FxWithdrawMintableERC721(rootToken, childToken, receiver, tokenId);
 
-        FxERC721 rootTokenContract = FxERC721(childToken);
+        FxMintableERC721 rootTokenContract = FxMintableERC721(childToken);
         string memory name = rootTokenContract.name();
         string memory symbol = rootTokenContract.symbol();
         bytes memory metadata = abi.encode(name, symbol);
