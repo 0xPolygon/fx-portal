@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {FxERC1155} from "../../tokens/FxERC1155.sol";
+import {FxMintableERC1155} from "../../tokens/FxMintableERC1155.sol";
 import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 import {Ownable} from "../../lib/Ownable.sol";
 import {Address} from "../../lib/Address.sol";
@@ -69,7 +69,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
     //
 
     // deploy child token with unique id
-    function deployChildToken(uint256 _uniqueId, string calldata _uri) external {
+    function deployChildToken(uint256 _uniqueId, string calldata _uri) external onlyOwner {
         // deploy new child token using unique id
         address childToken = createClone(keccak256(abi.encodePacked(_uniqueId)), childTokenTemplate); // child salt, childTokenTemplate
 
@@ -86,26 +86,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         emit TokenMapped(rootToken, childToken);
 
         // initialize child token with all parameters
-        FxERC1155(childToken).initialize(address(this), rootToken, _uri);
-    }
-
-    // Mint tokens on child chain
-    function mintToken(
-        address _childToken,
-        uint256 _tokenId,
-        uint256 _amount,
-        bytes calldata _data
-    ) external {
-        FxERC1155 childTokenContract = FxERC1155(_childToken);
-        // child token contract will have root token
-        address rootToken = childTokenContract.connectedToken();
-
-        // validate root and child token mapping
-        require(
-            _childToken != address(0x0) && rootToken != address(0x0) && _childToken == rootToChildToken[rootToken],
-            "FxMintableERC721ChildTunnel: NO_MAPPED_TOKEN"
-        );
-        childTokenContract.mint(msg.sender, _tokenId, _amount, _data);
+        FxMintableERC1155(childToken).initialize(address(this), rootToken, _uri, msg.sender);
     }
 
     function withdraw(
@@ -171,9 +152,9 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             .decode(syncData, (address, address, address, uint256, uint256, bytes));
 
         address childToken = rootToChildToken[rootToken];
-        FxERC1155 childTokenContract = FxERC1155(childToken);
+        FxMintableERC1155 childTokenContract = FxMintableERC1155(childToken);
 
-        childTokenContract.mint(to, tokenId, amount, data);
+        childTokenContract.mintToken(to, tokenId, amount, data);
         emit FxDepositMintableERC1155(rootToken, depositor, to, tokenId, amount);
     }
 
@@ -188,9 +169,9 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         ) = abi.decode(syncData, (address, address, address, uint256[], uint256[], bytes));
 
         address childToken = rootToChildToken[rootToken];
-        FxERC1155 childTokenContract = FxERC1155(childToken);
+        FxMintableERC1155 childTokenContract = FxMintableERC1155(childToken);
 
-        childTokenContract.mintBatch(to, tokenIds, amounts, data);
+        childTokenContract.mintTokenBatch(to, tokenIds, amounts, data);
         emit FxBatchDepositMintableERC1155(rootToken, depositor, to, tokenIds, amounts);
     }
 
@@ -201,7 +182,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         uint256 amount,
         bytes calldata data
     ) internal {
-        FxERC1155 childTokenContract = FxERC1155(childToken);
+        FxMintableERC1155 childTokenContract = FxMintableERC1155(childToken);
         address rootToken = childTokenContract.connectedToken();
 
         require(
@@ -212,7 +193,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         childTokenContract.burn(msg.sender, id, amount);
         emit FxWithdrawMintableERC1155(rootToken, childToken, receiver, id, amount);
 
-        FxERC1155 rootTokenContract = FxERC1155(childToken);
+        FxMintableERC1155 rootTokenContract = FxMintableERC1155(childToken);
         bytes memory metadata = abi.encode(rootTokenContract.uri(id));
 
         _sendMessageToRoot(
@@ -227,7 +208,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         uint256[] calldata amounts,
         bytes calldata data
     ) internal {
-        FxERC1155 childTokenContract = FxERC1155(childToken);
+        FxMintableERC1155 childTokenContract = FxMintableERC1155(childToken);
         address rootToken = childTokenContract.connectedToken();
 
         require(
@@ -235,7 +216,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
             "FxMintableERC1155ChildTunnel: NO_MAPPED_TOKEN"
         );
 
-        FxERC1155 rootTokenContract = FxERC1155(childToken);
+        FxMintableERC1155 rootTokenContract = FxMintableERC1155(childToken);
         bytes memory metadata;
         {
             uint256 length = ids.length;
