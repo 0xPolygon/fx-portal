@@ -5,6 +5,7 @@ import {ERC1155} from "../../lib/ERC1155.sol";
 import {ERC1155Holder} from "../../lib/ERC1155Holder.sol";
 import {Create2} from "../../lib/Create2.sol";
 import {FxBaseRootTunnel} from "../../tunnel/FxBaseRootTunnel.sol";
+import {Address} from "../../lib/Address.sol";
 
 contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
@@ -142,6 +143,10 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     function _syncWithdraw(bytes memory syncData) internal {
         (address rootToken, address childToken, address user, uint256 id, uint256 amount, bytes memory data) = abi
             .decode(syncData, (address, address, address, uint256, uint256, bytes));
+        // if root token is not available, create it
+        if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
+            mapToken(rootToken);
+        }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
         ERC1155(rootToken).safeTransferFrom(address(this), user, id, amount, data);
         emit FxWithdrawMintableERC1155(rootToken, childToken, user, id, amount);
@@ -156,6 +161,10 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
             uint256[] memory amounts,
             bytes memory data
         ) = abi.decode(syncData, (address, address, address, uint256[], uint256[], bytes));
+        // if root token is not available, create it
+        if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
+            mapToken(rootToken);
+        }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
         ERC1155(rootToken).safeBatchTransferFrom(address(this), user, ids, amounts, data);
         emit FxWithdrawBatchMintableERC1155(rootToken, childToken, user, ids, amounts);
