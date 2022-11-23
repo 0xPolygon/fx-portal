@@ -55,11 +55,11 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         address _childTokenTemplate,
         address _rootTokenTemplate
     ) FxBaseChildTunnel(_fxChild) {
-        childTokenTemplate = _childTokenTemplate;
         require(
             Address.isContract(_childTokenTemplate),
             "FxMintableERC1155ChildTunnel: Token template is not contract"
         );
+        childTokenTemplate = _childTokenTemplate;
         // compute root token template code hash
         rootTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_rootTokenTemplate));
     }
