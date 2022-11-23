@@ -53,7 +53,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
 
     // deploy child token with unique id
     function deployChildToken(
-        uint256 _uniqueId,
+        bytes32 _uniqueId,
         string calldata _name,
         string calldata _symbol
     ) external {
