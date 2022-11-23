@@ -41,8 +41,8 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         address _childTokenTemplate,
         address _rootTokenTemplate
     ) FxBaseChildTunnel(_fxChild) {
-        childTokenTemplate = _childTokenTemplate;
         require(Address.isContract(_childTokenTemplate), "FxMintableERC721ChildTunnel: Token template is not contract");
+        childTokenTemplate = _childTokenTemplate;
         // compute root token template code hash
         rootTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_rootTokenTemplate));
     }
