@@ -56,7 +56,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
         uint256 _uniqueId,
         string calldata _name,
         string calldata _symbol
-    ) external onlyOwner {
+    ) external {
         // deploy new child token using unique id
         address childToken = createClone(keccak256(abi.encodePacked(_uniqueId)), childTokenTemplate); // childSalt, childTokenTemplate
 
