@@ -30,9 +30,9 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
     // root to child token
     mapping(address => address) public rootToChildToken;
     // child token template
-    address public childTokenTemplate;
+    address public immutable childTokenTemplate;
     // root token template code hash
-    bytes32 public rootTokenTemplateCodeHash;
+    bytes32 public immutable rootTokenTemplateCodeHash;
 
     constructor(
         address _fxChild,

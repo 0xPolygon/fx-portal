@@ -20,7 +20,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
     // root to child token
     mapping(address => address) public rootToChildToken;
     // token template
-    address public tokenTemplate;
+    address public immutable tokenTemplate;
 
     constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
         tokenTemplate = _tokenTemplate;

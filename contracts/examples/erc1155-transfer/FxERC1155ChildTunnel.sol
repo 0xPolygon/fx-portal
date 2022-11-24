@@ -17,7 +17,7 @@ contract FxERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder {
     event TokenMapped(address indexed rootToken, address indexed childToken);
     // root to child token
     mapping(address => address) public rootToChildToken;
-    address public tokenTemplate;
+    address public immutable tokenTemplate;
 
     constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
         tokenTemplate = _tokenTemplate;
