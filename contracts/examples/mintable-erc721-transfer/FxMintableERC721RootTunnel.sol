@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {FxERC721} from "../../tokens/FxERC721.sol";
+import {IFxERC721} from "../../tokens/IFxERC721.sol";
 import {Create2} from "../../lib/Create2.sol";
 import {FxBaseRootTunnel} from "../../tunnel/FxBaseRootTunnel.sol";
 import {IERC721Receiver} from "../../lib/IERC721Receiver.sol";
@@ -51,7 +51,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC721RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
-        FxERC721(rootToken).safeTransferFrom(
+        IFxERC721(rootToken).safeTransferFrom(
             msg.sender, // depositor
             address(this), // manager contract
             tokenId,
@@ -97,14 +97,14 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC721RootTunnel: INVALID_MAPPING_ON_EXIT");
 
         // check if current token has been minted on root chain
-        FxERC721 nft = FxERC721(rootToken);
+        IFxERC721 nft = IFxERC721(rootToken);
         address currentOwner = nft.ownerOf(tokenId);
         if (currentOwner == address(0)) {
             nft.mint(address(this), tokenId, "");
         }
 
         // transfer from tokens to
-        FxERC721(rootToken).safeTransferFrom(address(this), to, tokenId, syncData);
+        IFxERC721(rootToken).safeTransferFrom(address(this), to, tokenId, syncData);
         emit FxWithdrawMintableERC721(rootToken, childToken, to, tokenId);
     }
 
@@ -116,7 +116,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
-        FxERC721(rootToken).initialize(address(this), childToken, name, symbol);
+        IFxERC721(rootToken).initialize(address(this), childToken, name, symbol);
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
