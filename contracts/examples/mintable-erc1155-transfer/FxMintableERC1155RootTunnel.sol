@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {FxERC1155} from "../../tokens/FxERC1155.sol";
+import {IFxERC1155} from "../../tokens/IFxERC1155.sol";
 import {ERC1155Holder} from "../../lib/ERC1155Holder.sol";
 import {Create2} from "../../lib/Create2.sol";
 import {FxBaseRootTunnel} from "../../tunnel/FxBaseRootTunnel.sol";
@@ -63,7 +63,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC1155RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
-        FxERC1155(rootToken).safeTransferFrom(
+        IFxERC1155(rootToken).safeTransferFrom(
             msg.sender, // depositor
             address(this), // manager contract
             id,
@@ -86,7 +86,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC1155RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
-        FxERC1155(rootToken).safeBatchTransferFrom(
+        IFxERC1155(rootToken).safeBatchTransferFrom(
             msg.sender, // depositor
             address(this), // manager contract
             ids,
@@ -126,7 +126,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
             _deployRootToken(rootToken, metadata);
         }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
-        FxERC1155(rootToken).safeTransferFrom(address(this), user, id, amount, data);
+        IFxERC1155(rootToken).safeTransferFrom(address(this), user, id, amount, data);
         emit FxWithdrawMintableERC1155(rootToken, childToken, user, id, amount);
     }
 
@@ -145,7 +145,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
             _deployRootToken(rootToken, metadata);
         }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
-        FxERC1155(rootToken).safeBatchTransferFrom(address(this), user, ids, amounts, data);
+        IFxERC1155(rootToken).safeBatchTransferFrom(address(this), user, ids, amounts, data);
         emit FxWithdrawBatchMintableERC1155(rootToken, childToken, user, ids, amounts);
     }
 
@@ -153,7 +153,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
-        FxERC1155(rootToken).initialize(address(this), childToken, uri);
+        IFxERC1155(rootToken).initialize(address(this), childToken, uri);
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
