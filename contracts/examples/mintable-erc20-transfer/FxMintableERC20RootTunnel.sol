@@ -5,6 +5,7 @@ import {Create2} from "../../lib/Create2.sol";
 import {FxERC20} from "../../tokens/FxERC20.sol";
 import {FxBaseRootTunnel} from "../../tunnel/FxBaseRootTunnel.sol";
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {Address} from "../../lib/Address.sol";
 
 /**
  * @title FxMintableERC20RootTunnel
@@ -12,9 +13,7 @@ import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeE
 contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
     using SafeERC20 for IERC20;
 
-    // maybe DEPOSIT and MAP_TOKEN can be reduced to bytes4
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
-    //bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
     mapping(address => address) public rootToChildTokens;
     address public rootTokenTemplate;
@@ -44,7 +43,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         address rootToken,
         address user,
         uint256 amount,
-        bytes memory data
+        bytes calldata data
     ) public {
         // map token if not mapped
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC20RootTunnel: NO_MAPPING_FOUND");
@@ -71,7 +70,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         );
 
         // if root token is not available, create it
-        if (!_isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
+        if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
             (string memory name, string memory symbol, uint8 decimals) = abi.decode(metaData, (string, string, uint8));
 
             address _createdToken = _deployRootToken(childToken, name, symbol, decimals);
@@ -113,14 +112,5 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         rootToChildTokens[rootToken] = childToken;
 
         return rootToken;
-    }
-
-    // check if address is contract
-    function _isContract(address _addr) private view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_addr)
-        }
-        return (size > 0);
     }
 }
