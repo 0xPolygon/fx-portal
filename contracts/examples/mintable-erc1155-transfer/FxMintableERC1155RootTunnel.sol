@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {ERC1155} from "../../lib/ERC1155.sol";
+import {FxERC1155} from "../../tokens/FxERC1155.sol";
 import {ERC1155Holder} from "../../lib/ERC1155Holder.sol";
 import {Create2} from "../../lib/Create2.sol";
 import {FxBaseRootTunnel} from "../../tunnel/FxBaseRootTunnel.sol";
@@ -12,7 +12,6 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     bytes32 public constant DEPOSIT_BATCH = keccak256("DEPOSIT_BATCH");
     bytes32 public constant WITHDRAW = keccak256("WITHDRAW");
     bytes32 public constant WITHDRAW_BATCH = keccak256("WITHDRAW_BATCH");
-    bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
     event TokenMappedMintableERC1155(address indexed rootToken, address indexed childToken);
     event FxWithdrawMintableERC1155(
@@ -44,36 +43,14 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     );
 
     mapping(address => address) public rootToChildTokens;
-    bytes32 public immutable childTokenTemplateCodeHash;
+    address public immutable rootTokenTemplate;
 
     constructor(
         address _checkpointManager,
         address _fxRoot,
-        address _fxERC1155Token
+        address _rootTokenTemplate
     ) FxBaseRootTunnel(_checkpointManager, _fxRoot) {
-        childTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_fxERC1155Token));
-    }
-
-    function mapToken(address rootToken) public {
-        require(rootToChildTokens[rootToken] == address(0x0), "FxMintableERC1155RootTunnel: ALREADY_MAPPED");
-
-        ERC1155 rootTokenContract = ERC1155(rootToken);
-        string memory uri = rootTokenContract.uri(0);
-
-        // MAP_TOKEN, encode(rootToken,uri)
-        bytes memory message = abi.encode(MAP_TOKEN, abi.encode(rootToken, uri));
-        _sendMessageToChild(message);
-
-        // compute child token address before deployment using create2
-        address childToken = computedCreate2Address(
-            keccak256(abi.encodePacked(rootToken)), // childSalt
-            childTokenTemplateCodeHash,
-            fxChildTunnel
-        );
-
-        // add into mapped tokens
-        rootToChildTokens[rootToken] = childToken;
-        emit TokenMappedMintableERC1155(rootToken, childToken);
+        rootTokenTemplate = _rootTokenTemplate;
     }
 
     function deposit(
@@ -83,13 +60,10 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         uint256 amount,
         bytes calldata data
     ) public {
-        // map token if not mapped
-        if (rootToChildTokens[rootToken] == address(0x0)) {
-            mapToken(rootToken);
-        }
+        require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC1155RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
-        ERC1155(rootToken).safeTransferFrom(
+        FxERC1155(rootToken).safeTransferFrom(
             msg.sender, // depositor
             address(this), // manager contract
             id,
@@ -109,13 +83,10 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         uint256[] calldata amounts,
         bytes calldata data
     ) public {
-        // map token if not mapped
-        if (rootToChildTokens[rootToken] == address(0x0)) {
-            mapToken(rootToken);
-        }
+        require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC1155RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
-        ERC1155(rootToken).safeBatchTransferFrom(
+        FxERC1155(rootToken).safeBatchTransferFrom(
             msg.sender, // depositor
             address(this), // manager contract
             ids,
@@ -141,14 +112,21 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     }
 
     function _syncWithdraw(bytes memory syncData) internal {
-        (address rootToken, address childToken, address user, uint256 id, uint256 amount, bytes memory data) = abi
-            .decode(syncData, (address, address, address, uint256, uint256, bytes));
+        (
+            address rootToken,
+            address childToken,
+            address user,
+            uint256 id,
+            uint256 amount,
+            bytes memory data,
+            string memory metadata
+        ) = abi.decode(syncData, (address, address, address, uint256, uint256, bytes, string));
         // if root token is not available, create it
         if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
-            mapToken(rootToken);
+            _deployRootToken(rootToken, metadata);
         }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
-        ERC1155(rootToken).safeTransferFrom(address(this), user, id, amount, data);
+        FxERC1155(rootToken).safeTransferFrom(address(this), user, id, amount, data);
         emit FxWithdrawMintableERC1155(rootToken, childToken, user, id, amount);
     }
 
@@ -159,14 +137,26 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
             address user,
             uint256[] memory ids,
             uint256[] memory amounts,
-            bytes memory data
-        ) = abi.decode(syncData, (address, address, address, uint256[], uint256[], bytes));
+            bytes memory data,
+            string memory metadata
+        ) = abi.decode(syncData, (address, address, address, uint256[], uint256[], bytes, string));
         // if root token is not available, create it
         if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
-            mapToken(rootToken);
+            _deployRootToken(rootToken, metadata);
         }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
-        ERC1155(rootToken).safeBatchTransferFrom(address(this), user, ids, amounts, data);
+        FxERC1155(rootToken).safeBatchTransferFrom(address(this), user, ids, amounts, data);
         emit FxWithdrawBatchMintableERC1155(rootToken, childToken, user, ids, amounts);
+    }
+
+    function _deployRootToken(address childToken, string memory uri) internal {
+        // deploy new root token
+        bytes32 salt = keccak256(abi.encodePacked(childToken));
+        address rootToken = createClone(salt, rootTokenTemplate);
+        FxERC1155(rootToken).initialize(address(this), childToken, uri);
+
+        // add into mapped tokens
+        rootToChildTokens[rootToken] = childToken;
+        emit TokenMappedMintableERC1155(rootToken, childToken);
     }
 }
