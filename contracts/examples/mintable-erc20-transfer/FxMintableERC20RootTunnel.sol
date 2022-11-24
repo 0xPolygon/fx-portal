@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Create2} from "../../lib/Create2.sol";
-import {FxERC20} from "../../tokens/FxERC20.sol";
+import {IFxERC20} from "../../tokens/IFxERC20.sol";
 import {FxBaseRootTunnel} from "../../tunnel/FxBaseRootTunnel.sol";
 import {SafeERC20, IERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {Address} from "../../lib/Address.sol";
@@ -82,7 +82,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
 
         // check if current balance for token is less than amount,
         // mint remaining amount for this address
-        FxERC20 tokenObj = FxERC20(rootToken);
+        IFxERC20 tokenObj = IFxERC20(rootToken);
         uint256 balanceOf = tokenObj.balanceOf(address(this));
         if (balanceOf < amount) {
             tokenObj.mint(address(this), amount - balanceOf);
@@ -106,7 +106,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
-        FxERC20(rootToken).initialize(address(this), childToken, name, symbol, decimals);
+        IFxERC20(rootToken).initialize(address(this), childToken, name, symbol, decimals);
 
         // add into mapped tokens
         rootToChildTokens[rootToken] = childToken;
