@@ -4,17 +4,29 @@ pragma solidity ^0.8.0;
 import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 import {Create2} from "../../lib/Create2.sol";
 import {Ownable} from "../../lib/Ownable.sol";
-import {FxERC20} from "../../tokens/FxERC20.sol";
+import {FxMintableERC20} from "../../tokens/FxMintableERC20.sol";
+import {Address} from "../../lib/Address.sol";
 
 /**
  * @title FxMintableERC20ChildTunnel
  */
 contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
-    //bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
 
     // event for token mapping
     event TokenMapped(address indexed rootToken, address indexed childToken);
+    event FxWithdrawMintableERC20(
+        address indexed rootToken,
+        address indexed childToken,
+        address indexed userAddress,
+        uint256 amount
+    );
+    event FxDepositMintableERC20(
+        address indexed rootToken,
+        address indexed depositor,
+        address indexed userAddress,
+        uint256 amount
+    );
     // root to child token
     mapping(address => address) public rootToChildToken;
     // child token template
@@ -28,18 +40,18 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         address _rootTokenTemplate
     ) FxBaseChildTunnel(_fxChild) {
         childTokenTemplate = _childTokenTemplate;
-        require(_isContract(_childTokenTemplate), "Token template is not contract");
+        require(Address.isContract(_childTokenTemplate), "FxMintableERC20ChildTunnel: Token template is not contract");
         // compute root token template code hash
         rootTokenTemplateCodeHash = keccak256(minimalProxyCreationCode(_rootTokenTemplate));
     }
 
     // deploy child token with unique id
     function deployChildToken(
-        uint256 uniqueId,
+        bytes32 uniqueId,
         string memory name,
         string memory symbol,
         uint8 decimals
-    ) public onlyOwner returns (address) {
+    ) external {
         // deploy new child token using unique id
         bytes32 childSalt = keccak256(abi.encodePacked(uniqueId));
         address childToken = createClone(childSalt, childTokenTemplate);
@@ -54,23 +66,7 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         emit TokenMapped(rootToken, childToken);
 
         // initialize child token with all parameters
-        FxERC20(childToken).initialize(address(this), rootToken, name, symbol, decimals);
-    }
-
-    //To mint tokens on child chain
-    function mintToken(address childToken, uint256 amount) public onlyOwner {
-        FxERC20 childTokenContract = FxERC20(childToken);
-        // child token contract will have root token
-        address rootToken = childTokenContract.connectedToken();
-
-        // validate root and child token mapping
-        require(
-            childToken != address(0x0) && rootToken != address(0x0) && childToken == rootToChildToken[rootToken],
-            "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
-        );
-
-        //mint token
-        childTokenContract.mint(msg.sender, amount);
+        FxMintableERC20(childToken).initialize(address(this), rootToken, name, symbol, decimals, msg.sender);
     }
 
     function withdraw(address childToken, uint256 amount) public {
@@ -90,21 +86,22 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         address childToken,
         uint256 amount
     ) internal {
-        FxERC20 childTokenContract = FxERC20(childToken);
+        FxMintableERC20 childTokenContract = FxMintableERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
 
         // validate root and child token mapping
         require(
             childToken != address(0x0) && rootToken != address(0x0) && childToken == rootToChildToken[rootToken],
-            "FxERC20ChildTunnel: NO_MAPPED_TOKEN"
+            "FxMintableERC20ChildTunnel: NO_MAPPED_TOKEN"
         );
 
         // withdraw tokens
         childTokenContract.burn(msg.sender, amount);
+        emit FxWithdrawMintableERC20(rootToken, childToken, receiver, amount);
 
         // name, symbol and decimals
-        FxERC20 rootTokenContract = FxERC20(childToken);
+        FxMintableERC20 rootTokenContract = FxMintableERC20(childToken);
         string memory name = rootTokenContract.name();
         string memory symbol = rootTokenContract.symbol();
         uint8 decimals = rootTokenContract.decimals();
@@ -129,7 +126,7 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         if (syncType == DEPOSIT) {
             _syncDeposit(syncData);
         } else {
-            revert("FxERC20ChildTunnel: INVALID_SYNC_TYPE");
+            revert("FxMintableERC20ChildTunnel: INVALID_SYNC_TYPE");
         }
     }
 
@@ -141,11 +138,12 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
         address childToken = rootToChildToken[rootToken];
 
         // deposit tokens
-        FxERC20 childTokenContract = FxERC20(childToken);
-        childTokenContract.mint(to, amount);
+        FxMintableERC20 childTokenContract = FxMintableERC20(childToken);
+        childTokenContract.mintToken(to, amount);
+        emit FxDepositMintableERC20(rootToken, depositor, to, amount);
 
         // call `onTokenTranfer` on `to` with limit and ignore error
-        if (_isContract(to)) {
+        if (Address.isContract(to)) {
             uint256 txGas = 2000000;
             bool success = false;
             bytes memory data = abi.encodeWithSignature(
@@ -162,14 +160,5 @@ contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
                 success := call(txGas, to, 0, add(data, 0x20), mload(data), 0, 0)
             }
         }
-    }
-
-    // check if address is contract
-    function _isContract(address _addr) private view returns (bool) {
-        uint32 size;
-        assembly {
-            size := extcodesize(_addr)
-        }
-        return (size > 0);
     }
 }
