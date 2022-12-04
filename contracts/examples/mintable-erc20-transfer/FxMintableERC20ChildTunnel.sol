@@ -3,14 +3,13 @@ pragma solidity ^0.8.0;
 
 import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 import {Create2} from "../../lib/Create2.sol";
-import {Ownable} from "../../lib/Ownable.sol";
 import {FxMintableERC20} from "../../tokens/FxMintableERC20.sol";
 import {Address} from "../../lib/Address.sol";
 
 /**
  * @title FxMintableERC20ChildTunnel
  */
-contract FxMintableERC20ChildTunnel is Ownable, FxBaseChildTunnel, Create2 {
+contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
 
     // event for token mapping
