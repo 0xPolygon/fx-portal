@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import {IERC20} from "../lib/IERC20.sol";
+import {IERC20Metadata} from "../lib/IERC20Metadata.sol";
 
-interface IFxMintableERC20 is IERC20 {
+interface IFxMintableERC20 is IERC20Metadata {
     function fxManager() external returns (address);
 
     function connectedToken() external returns (address);
