@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {FxBaseChildTunnel} from "../../tunnel/FxBaseChildTunnel.sol";
 import {Create2} from "../../lib/Create2.sol";
-import {FxMintableERC20} from "../../tokens/FxMintableERC20.sol";
+import {IFxMintableERC20} from "../../tokens/IFxMintableERC20.sol";
 import {Address} from "../../lib/Address.sol";
 
 /**
@@ -65,7 +65,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         emit TokenMapped(rootToken, childToken);
 
         // initialize child token with all parameters
-        FxMintableERC20(childToken).initialize(address(this), rootToken, name, symbol, decimals, msg.sender);
+        IFxMintableERC20(childToken).initialize(address(this), rootToken, name, symbol, decimals, msg.sender);
     }
 
     function withdraw(address childToken, uint256 amount) public {
@@ -85,7 +85,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         address childToken,
         uint256 amount
     ) internal {
-        FxMintableERC20 childTokenContract = FxMintableERC20(childToken);
+        IFxMintableERC20 childTokenContract = IFxMintableERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
 
@@ -100,7 +100,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         emit FxWithdrawMintableERC20(rootToken, childToken, receiver, amount);
 
         // name, symbol and decimals
-        FxMintableERC20 rootTokenContract = FxMintableERC20(childToken);
+        IFxMintableERC20 rootTokenContract = IFxMintableERC20(childToken);
         string memory name = rootTokenContract.name();
         string memory symbol = rootTokenContract.symbol();
         uint8 decimals = rootTokenContract.decimals();
@@ -137,7 +137,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         address childToken = rootToChildToken[rootToken];
 
         // deposit tokens
-        FxMintableERC20 childTokenContract = FxMintableERC20(childToken);
+        IFxMintableERC20 childTokenContract = IFxMintableERC20(childToken);
         childTokenContract.mintToken(to, amount);
         emit FxDepositMintableERC20(rootToken, depositor, to, amount);
 
