@@ -26,11 +26,15 @@ module.exports = {
   },
   networks: {
     mainnet: {
-      url: process.env.MAINNET_RPC || "https://main-light.eth.linkpool.io",
+      url:
+        process.env.MAINNET_RPC ||
+        "https://mainnet.infura.io/v3/",
       accounts,
     },
     goerli: {
-      url: process.env.GOERLI_RPC || "https://goerli-light.eth.linkpool.io",
+      url:
+        process.env.GOERLI_RPC ||
+        "https://goerli.infura.io/v3/",
       accounts,
     },
     polygon: {
