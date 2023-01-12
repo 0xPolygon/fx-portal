@@ -8,14 +8,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Get node.js
         uses: actions/setup-node@v3
         with:
+          node-version: "18.x"
           cache: "npm"
-          node-version: "16.x"
       - run: npm ci
       - run: npx hardhat compile --show-stack-traces
+      - run: npx hardhat test --parallel
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: "npm"
+      - run: npm ci
+      - run: npx solhint "contracts/**/*.sol"
+      - run: npx prettier -c .
+  slither:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Get node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+          cache: "npm"
+      - run: rm foundry.toml # force hardhat https://github.com/foundry-rs/foundry/issues/3827
+      - uses: crytic/slither-action@v0.2.0
