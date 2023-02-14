@@ -10,8 +10,8 @@ require("@nomiclabs/hardhat-etherscan");
 
 let accounts = [];
 
-if (process.env.PRIVATE_KEY) {
-  accounts = [`0x${process.env.PRIVATE_KEY}`, ...accounts];
+if (process.env.ACCOUNT_KEY_PRIV_MAINNET) {
+  accounts = [`0x${process.env.ACCOUNT_KEY_PRIV_MAINNET}`, ...accounts];
 }
 
 module.exports = {
@@ -26,23 +26,34 @@ module.exports = {
   },
   networks: {
     mainnet: {
-      url: process.env.MAINNET_RPC || "https://mainnet.infura.io/v3/",
-      accounts,
+      url: `${process.env.NETWORK_MAINNET}`,
+      accounts: [`0x${process.env.ACCOUNT_KEY_PRIV_MAINNET}`],
     },
     goerli: {
-      url: process.env.GOERLI_RPC || "https://goerli.infura.io/v3/",
-      accounts,
+      url: `${process.env.NETWORK_GOERLI}`,
+      accounts: [`0x${process.env.ACCOUNT_KEY_PRIV_GOERLI}`],
     },
     polygon: {
-      url: process.env.POLYGON_RPC || "https://polygon-rpc.com",
-      accounts,
+      url: `${process.env.NETWORK_POLYGON}`,
+      accounts: [`0x${process.env.ACCOUNT_KEY_PRIV_POLYGON}`],
     },
     mumbai: {
-      url: process.env.MUMBAI_RPC || "https://rpc-mumbai.maticvigil.com",
-      accounts,
+      url: `${process.env.NETWORK_POLYGON_MUMBAI}`,
+      accounts: [`0x${process.env.ACCOUNT_KEY_PRIV_MUMBAI}`],
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      //ethereum
+      mainnet: `${process.env.ETHERSCAN}`,
+      ropsten: `${process.env.ETHERSCAN}`,
+      rinkeby: `${process.env.ETHERSCAN}`,
+      goerli: `${process.env.ETHERSCAN}`,
+      kovan: `${process.env.ETHERSCAN}`,
+
+      //polygon
+      polygon: `${process.env.POLYGONSCAN}`,
+      polygonMumbai: `${process.env.POLYGONSCAN}`,
+    },
   },
 };
