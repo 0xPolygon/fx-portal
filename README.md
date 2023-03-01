@@ -2,7 +2,9 @@
 
 FxPortal for Polygon(prev Matic)Chain. No mapping. Seamless communication with Ethereum Network.
 
-Audit - [Fx-Portal Contracts Audit by Halborn](<https://github.com/fx-portal/contracts/blob/main/Polygon_FX_Portal_Smart_Contract_Security_Audit_Halborn_v1_0%20(1).pdf>)
+### Audits
+- [Halborn](audits/Polygon_FX_Portal_Smart_Contract_Security_Audit_Halborn_v1_0.pdf)
+- [ChainSecurity](audits/ChainSecurity_Polygon_Fx_Portal_audit.pdf)
 
 ### What is Fx bridge (fx-portal)?
 
