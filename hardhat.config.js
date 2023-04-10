@@ -11,7 +11,7 @@ require("@nomiclabs/hardhat-etherscan");
 let accounts = [];
 
 if (process.env.PRIVATE_KEY) {
-  accounts = [`0x${process.env.PRIVATE_KEY}`, ...accounts];
+  accounts = [`${process.env.PRIVATE_KEY}`, ...accounts];
 }
 
 module.exports = {
@@ -25,7 +25,7 @@ module.exports = {
     },
   },
   networks: {
-    mainnet: {
+    ethereum: {
       url: process.env.MAINNET_RPC || "https://mainnet.infura.io/v3/",
       accounts,
     },
