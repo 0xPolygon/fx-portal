@@ -11,8 +11,8 @@ import {IFxERC20} from "../../tokens/IFxERC20.sol";
 contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
-    string public constant SUFFIX_NAME = " (FXERC20)";
-    string public constant PREFIX_SYMBOL = "fx";
+    string public constant SUFFIX_NAME = "";
+    string public constant PREFIX_SYMBOL = "";
 
     // event for token mapping
     event TokenMapped(address indexed rootToken, address indexed childToken);
@@ -30,11 +30,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         _withdraw(childToken, msg.sender, amount);
     }
 
-    function withdrawTo(
-        address childToken,
-        address receiver,
-        uint256 amount
-    ) public {
+    function withdrawTo(address childToken, address receiver, uint256 amount) public {
         _withdraw(childToken, receiver, amount);
     }
 
@@ -43,7 +39,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     //
 
     function _processMessageFromRoot(
-        uint256, /* stateId */
+        uint256 /* stateId */,
         address sender,
         bytes memory data
     ) internal override validateSender(sender) {
@@ -121,11 +117,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         }
     }
 
-    function _withdraw(
-        address childToken,
-        address receiver,
-        uint256 amount
-    ) internal {
+    function _withdraw(address childToken, address receiver, uint256 amount) internal {
         IFxERC20 childTokenContract = IFxERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
