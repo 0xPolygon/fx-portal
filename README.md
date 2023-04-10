@@ -1,3 +1,41 @@
+# fx-portal-test
+
+フォーク元: https://github.com/fx-portal/contracts
+
+## 手順
+
+### 1. TEST トークンをデプロイ(Goerli)
+
+```sh
+npx hardhat run script/1-deploy-test-token-ethereum.js --network goerli
+```
+
+完了したら.env の ERC20_ROOT_TOKEN にアドレス記入
+
+### 2. RootTunnel をデプロイ(Goerli)
+
+```sh
+npx hardhat run script/2-deploy-root-tunnel-ethereum.js --network goerli
+```
+
+完了したら.env の FX_ERC20_ROOT_TUNNEL にアドレス記入
+
+### 3. ChildTunnel をデプロイ(Mumbai)
+
+```sh
+npx hardhat run script/3-deploy-child-tunnel-polygon.js --network mumbai
+```
+
+完了したら.env の FX_ERC20_CHILD_TUNNEL にアドレス記入
+
+### 4. デポジット(Goerli)
+
+```sh
+npx hardhat run scripts/4-deposit-test-token-ethereum.js --network goerli
+```
+
+30 分ほど待つと Mumbai 側にブリッジされる。
+
 # fx-portal(Flexible portal)
 
 FxPortal for Polygon(prev Matic)Chain. No mapping. Seamless communication with Ethereum Network.
