@@ -1,0 +1,7 @@
+[profile.default]
+src = 'contracts'
+test = 'test'
+libs = ['node_modules', 'lib']
+out = 'out'
+cache_path  = 'forge-cache'
+verbosity = 2
