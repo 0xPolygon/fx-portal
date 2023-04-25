@@ -1,11 +1,11 @@
 [profile.default]
 src = 'contracts'
 test = 'test'
-libs = ['node_modules', 'lib']
+libs = ['lib']
 out = 'out'
 cache_path  = 'forge-cache'
 verbosity = 2
 remappings = [
   "@utils=test/utils/",
-  "@openzeppelin/=node_modules/@openzeppelin/"
+  "@openzeppelin/=lib/openzeppelin-contracts/"
 ]
