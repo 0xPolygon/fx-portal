@@ -2,10 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "@utils/Test.sol";
+import "@utils/Events.sol";
 import {FxRoot} from "contracts/FxRoot.sol";
 import {FxChild} from "contracts/FxChild.sol";
-import {MockStateSender} from "contracts/mock/StateSender.sol";
-import {MockStateReceiver} from "contracts/mock/StateReceiver.sol";
+import {MockStateSender} from "@mock/StateSender.sol";
+import {MockStateReceiver} from "@mock/StateReceiver.sol";
 
 contract FxBase is Test {
     FxRoot public fxRoot;
