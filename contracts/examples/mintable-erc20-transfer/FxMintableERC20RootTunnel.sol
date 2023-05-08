@@ -40,12 +40,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         rootTokenTemplate = _rootTokenTemplate;
     }
 
-    function deposit(
-        address rootToken,
-        address user,
-        uint256 amount,
-        bytes calldata data
-    ) public {
+    function deposit(address rootToken, address user, uint256 amount, bytes calldata data) public {
         // map token if not mapped
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC20RootTunnel: NO_MAPPING_FOUND");
 

@@ -54,13 +54,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         rootTokenTemplate = _rootTokenTemplate;
     }
 
-    function deposit(
-        address rootToken,
-        address user,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) public {
+    function deposit(address rootToken, address user, uint256 id, uint256 amount, bytes calldata data) public {
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC1155RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract

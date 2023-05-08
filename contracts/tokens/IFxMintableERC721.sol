@@ -16,11 +16,7 @@ interface IFxMintableERC721 is IERC721 {
         address minter
     ) external;
 
-    function mintToken(
-        address user,
-        uint256 tokenId,
-        bytes calldata _data
-    ) external;
+    function mintToken(address user, uint256 tokenId, bytes calldata _data) external;
 
     function burn(uint256 tokenId) external;
 }

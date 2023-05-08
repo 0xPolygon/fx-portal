@@ -12,7 +12,7 @@ library Merkle {
         uint256 proofHeight = proof.length / 32;
         // Proof of size n means, height of the tree is n+1.
         // In a tree of height n+1, max #leafs possible is 2 ^ n
-        require(index < 2**proofHeight, "Leaf index is too big");
+        require(index < 2 ** proofHeight, "Leaf index is too big");
 
         bytes32 proofElement;
         bytes32 computedHash = leaf;

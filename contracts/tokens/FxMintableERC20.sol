@@ -47,11 +47,7 @@ contract FxMintableERC20 is IFxMintableERC20, ERC20 {
     }
 
     // setup name, symbol and decimals
-    function setupMetaData(
-        string memory name_,
-        string memory symbol_,
-        uint8 decimals_
-    ) public {
+    function setupMetaData(string memory name_, string memory symbol_, uint8 decimals_) public {
         require(msg.sender == _fxManager, "Invalid sender");
         _setupMetaData(name_, symbol_, decimals_);
     }

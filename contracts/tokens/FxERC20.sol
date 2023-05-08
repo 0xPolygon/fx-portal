@@ -37,11 +37,7 @@ contract FxERC20 is IFxERC20, ERC20 {
     }
 
     // setup name, symbol and decimals
-    function setupMetaData(
-        string memory _name,
-        string memory _symbol,
-        uint8 _decimals
-    ) public {
+    function setupMetaData(string memory _name, string memory _symbol, uint8 _decimals) public {
         require(msg.sender == _fxManager, "Invalid sender");
         _setupMetaData(_name, _symbol, _decimals);
     }

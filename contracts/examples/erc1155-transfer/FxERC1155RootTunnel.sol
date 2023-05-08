@@ -74,13 +74,7 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
         emit TokenMappedERC1155(rootToken, childToken);
     }
 
-    function deposit(
-        address rootToken,
-        address user,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) public {
+    function deposit(address rootToken, address user, uint256 id, uint256 amount, bytes memory data) public {
         // map token if not mapped
         if (rootToChildTokens[rootToken] == address(0x0)) {
             mapToken(rootToken);

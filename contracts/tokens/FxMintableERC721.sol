@@ -54,11 +54,7 @@ contract FxMintableERC721 is IFxMintableERC721, ERC721 {
         minter = who;
     }
 
-    function mintToken(
-        address user,
-        uint256 tokenId,
-        bytes calldata _data
-    ) external override onlyMinterOrFxManager {
+    function mintToken(address user, uint256 tokenId, bytes calldata _data) external override onlyMinterOrFxManager {
         _safeMint(user, tokenId, _data);
     }
 

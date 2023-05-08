@@ -31,11 +31,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         _withdraw(childToken, msg.sender, amount);
     }
 
-    function withdrawTo(
-        address childToken,
-        address receiver,
-        uint256 amount
-    ) public {
+    function withdrawTo(address childToken, address receiver, uint256 amount) public {
         _withdraw(childToken, receiver, amount);
     }
 
@@ -44,7 +40,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     //
 
     function _processMessageFromRoot(
-        uint256, /* stateId */
+        uint256 /* stateId */,
         address sender,
         bytes memory data
     ) internal override validateSender(sender) {
@@ -123,11 +119,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         }
     }
 
-    function _withdraw(
-        address childToken,
-        address receiver,
-        uint256 amount
-    ) internal {
+    function _withdraw(address childToken, address receiver, uint256 amount) internal {
         IFxERC20 childTokenContract = IFxERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();

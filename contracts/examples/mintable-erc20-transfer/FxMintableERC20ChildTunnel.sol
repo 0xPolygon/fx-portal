@@ -34,11 +34,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     bytes32 public immutable rootTokenTemplateCodeHash;
 
     // slither-disable-next-line missing-zero-check
-    constructor(
-        address _fxChild,
-        address _childTokenTemplate,
-        address _rootTokenTemplate
-    ) FxBaseChildTunnel(_fxChild) {
+    constructor(address _fxChild, address _childTokenTemplate, address _rootTokenTemplate) FxBaseChildTunnel(_fxChild) {
         childTokenTemplate = _childTokenTemplate;
         require(Address.isContract(_childTokenTemplate), "FxMintableERC20ChildTunnel: Token template is not contract");
         // compute root token template code hash
@@ -46,12 +42,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     }
 
     // deploy child token with unique id
-    function deployChildToken(
-        bytes32 uniqueId,
-        string memory name,
-        string memory symbol,
-        uint8 decimals
-    ) external {
+    function deployChildToken(bytes32 uniqueId, string memory name, string memory symbol, uint8 decimals) external {
         // deploy new child token using unique id
         bytes32 childSalt = keccak256(abi.encodePacked(uniqueId));
         address childToken = createClone(childSalt, childTokenTemplate);
@@ -73,19 +64,11 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         _withdraw(msg.sender, childToken, amount);
     }
 
-    function withdrawTo(
-        address receiver,
-        address childToken,
-        uint256 amount
-    ) public {
+    function withdrawTo(address receiver, address childToken, uint256 amount) public {
         _withdraw(receiver, childToken, amount);
     }
 
-    function _withdraw(
-        address receiver,
-        address childToken,
-        uint256 amount
-    ) internal {
+    function _withdraw(address receiver, address childToken, uint256 amount) internal {
         IFxMintableERC20 childTokenContract = IFxMintableERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();
@@ -116,7 +99,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     //
 
     function _processMessageFromRoot(
-        uint256, /* stateId */
+        uint256 /* stateId */,
         address sender,
         bytes memory data
     ) internal override validateSender(sender) {

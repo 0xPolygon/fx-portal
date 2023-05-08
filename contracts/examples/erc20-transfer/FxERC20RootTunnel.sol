@@ -69,12 +69,7 @@ contract FxERC20RootTunnel is FxBaseRootTunnel, Create2 {
         emit TokenMappedERC20(rootToken, childToken);
     }
 
-    function deposit(
-        address rootToken,
-        address user,
-        uint256 amount,
-        bytes memory data
-    ) public {
+    function deposit(address rootToken, address user, uint256 amount, bytes memory data) public {
         // map token if not mapped
         if (rootToChildTokens[rootToken] == address(0x0)) {
             mapToken(rootToken);
