@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "npm run lint:sol && npm run prettier:check",
-    "lint:sol": "solhint \"{script,contracts,test}/**/*.sol\"",
+    "lint:sol": "solhint \"{script,contracts,test}/**/*.sol\" --quiet",
     "prettier:check": "prettier --check \"{script,contracts,test}/**/*.sol\"",
     "prettier:write": "prettier --write \"{script,contracts,test}/**/*.sol\""
   },
