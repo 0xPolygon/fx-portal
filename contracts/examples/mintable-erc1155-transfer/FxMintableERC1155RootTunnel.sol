@@ -154,6 +154,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
+        // slither-disable-next-line reentrancy-benign
         IFxERC1155(rootToken).initialize(address(this), childToken, uri);
 
         // add into mapped tokens

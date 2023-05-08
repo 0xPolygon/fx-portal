@@ -117,6 +117,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
+        // slither-disable-next-line reentrancy-benign
         IFxERC721(rootToken).initialize(address(this), childToken, name, symbol);
 
         // add into mapped tokens
