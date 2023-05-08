@@ -5,10 +5,7 @@ import {RLPReader} from "../lib/RLPReader.sol";
 import {MerklePatriciaProof} from "../lib/MerklePatriciaProof.sol";
 import {Merkle} from "../lib/Merkle.sol";
 import "../lib/ExitPayloadReader.sol";
-
-interface IFxStateSender {
-    function sendMessageToChild(address _receiver, bytes calldata _data) external;
-}
+import {IFxStateSender} from "../FxRoot.sol";
 
 contract ICheckpointManager {
     struct HeaderBlock {
@@ -66,6 +63,7 @@ abstract contract FxBaseRootTunnel {
      *   abi.encode(tokenId);
      *   abi.encode(tokenId, tokenMetadata);
      *   abi.encode(messageType, messageData);
+     * @custom:security non-reentrant
      */
     function _sendMessageToChild(bytes memory message) internal {
         fxRoot.sendMessageToChild(fxChildTunnel, message);

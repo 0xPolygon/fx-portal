@@ -7,8 +7,8 @@ interface IFxMintableERC1155 is IERC1155 {
     function fxManager() external returns (address);
 
     function initialize(
-        address fxManager,
-        address connectedToken,
+        address _fxManager,
+        address _connectedToken,
         string calldata uri,
         address minter
     ) external;
