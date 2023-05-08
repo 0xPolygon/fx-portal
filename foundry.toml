@@ -7,5 +7,6 @@ cache_path  = 'forge-cache'
 verbosity = 2
 remappings = [
   "@utils=test/utils/",
-  "@openzeppelin/=lib/openzeppelin-contracts/"
+  "@openzeppelin/=lib/openzeppelin-contracts/",
+  "@mock=test/mock/"
 ]
