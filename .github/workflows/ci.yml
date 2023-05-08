@@ -60,6 +60,6 @@ jobs:
           version: nightly
       - name: Build
         run: forge build
-      - uses: crytic/slither-action@v0.2.0
+      - uses: crytic/slither-action@v0.3.0
         with:
           ignore-compile: true
