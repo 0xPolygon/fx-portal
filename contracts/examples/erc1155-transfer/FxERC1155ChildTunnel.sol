@@ -88,6 +88,7 @@ contract FxERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder {
 
         bytes32 salt = keccak256(abi.encodePacked(rootToken));
         childToken = createClone(salt, tokenTemplate);
+        // slither-disable-next-line reentrancy-no-eth,reentrancy-events
         IFxERC1155(childToken).initialize(address(this), rootToken, string(abi.encodePacked(uri)));
 
         rootToChildToken[rootToken] = childToken;

@@ -31,6 +31,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         uint256 amount
     );
 
+    // slither-disable-next-line missing-zero-check
     constructor(
         address _checkpointManager,
         address _fxRoot,
@@ -89,6 +90,7 @@ contract FxMintableERC20RootTunnel is FxBaseRootTunnel, Create2 {
         }
 
         //approve token transfer
+        //slither-disable-next-line unused-return
         tokenObj.approve(address(this), amount);
 
         // transfer from tokens

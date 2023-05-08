@@ -30,6 +30,7 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
     mapping(address => address) public rootToChildTokens;
     address public immutable rootTokenTemplate;
 
+    // slither-disable-next-line missing-zero-check
     constructor(
         address _checkpointManager,
         address _fxRoot,

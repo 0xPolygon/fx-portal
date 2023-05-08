@@ -45,6 +45,7 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
     mapping(address => address) public rootToChildTokens;
     bytes32 public immutable childTokenTemplateCodeHash;
 
+    // slither-disable-next-line missing-zero-check
     constructor(
         address _checkpointManager,
         address _fxRoot,
@@ -61,6 +62,7 @@ contract FxERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder {
 
         // MAP_TOKEN, encode(rootToken,uri)
         bytes memory message = abi.encode(MAP_TOKEN, abi.encode(rootToken, uri));
+        // slither-disable-next-line reentrancy-no-eth
         _sendMessageToChild(message);
 
         // compute child token address before deployment using create2

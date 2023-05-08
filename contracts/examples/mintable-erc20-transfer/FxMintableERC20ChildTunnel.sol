@@ -33,6 +33,7 @@ contract FxMintableERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     // root token template code hash
     bytes32 public immutable rootTokenTemplateCodeHash;
 
+    // slither-disable-next-line missing-zero-check
     constructor(
         address _fxChild,
         address _childTokenTemplate,

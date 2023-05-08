@@ -45,6 +45,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     mapping(address => address) public rootToChildTokens;
     address public immutable rootTokenTemplate;
 
+    // slither-disable-next-line missing-zero-check
     constructor(
         address _checkpointManager,
         address _fxRoot,

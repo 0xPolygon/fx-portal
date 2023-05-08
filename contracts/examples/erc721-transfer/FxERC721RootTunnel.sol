@@ -64,6 +64,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
 
         // MAP_TOKEN, encode(rootToken, name, symbol)
         bytes memory message = abi.encode(MAP_TOKEN, abi.encode(rootToken, name, symbol));
+        // slither-disable-next-line reentrancy-no-eth
         _sendMessageToChild(message);
 
         // compute child token address before deployment using create2

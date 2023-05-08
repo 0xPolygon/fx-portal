@@ -21,6 +21,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     // token template
     address public immutable tokenTemplate;
 
+    // slither-disable-next-line missing-zero-check
     constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
         tokenTemplate = _tokenTemplate;
         require(_isContract(_tokenTemplate), "Token template is not contract");
@@ -74,6 +75,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         // deploy new child token
         bytes32 salt = keccak256(abi.encodePacked(rootToken));
         childToken = createClone(salt, tokenTemplate);
+        // slither-disable-next-line reentrancy-no-eth
         IFxERC20(childToken).initialize(
             address(this),
             rootToken,
