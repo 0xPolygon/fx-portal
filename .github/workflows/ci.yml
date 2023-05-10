@@ -22,8 +22,6 @@ jobs:
         run: forge build
       - name: Run tests
         run: forge test -vvv
-      - name: Get coverage
-        run: forge coverage
   coverage:
     runs-on: ubuntu-latest
     steps:
