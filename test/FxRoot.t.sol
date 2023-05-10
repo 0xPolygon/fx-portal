@@ -27,8 +27,7 @@ contract FxRootTest is FxBase {
         vm.startPrank(alice);
         MockMessageProcessor mockTunnel = new MockMessageProcessor();
         bytes memory data = new bytes(0);
-
-        vm.expectEmit(true, false, false, true, address(mockTunnel));
+        vm.expectEmit(address(mockTunnel));
         emit MessageProcessed(1, alice, data);
         fxRoot.sendMessageToChild(address(mockTunnel), data);
         vm.stopPrank();

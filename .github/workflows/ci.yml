@@ -4,29 +4,16 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
+    branches: [main,dev/foundry]
   workflow_dispatch:
 
 jobs:
-  tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Get node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
-          cache: "npm"
-      - run: npm ci
-      - run: npx hardhat compile --show-stack-traces
-      - run: npx hardhat test --parallel
   forge-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-
       - name: Install Foundry
         uses: foundry-rs/foundry-toolchain@v1
         with:
@@ -35,6 +22,18 @@ jobs:
         run: forge build
       - name: Run tests
         run: forge test -vvv
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+      - name: Build
+        run: forge build
       - name: Get coverage
         run: forge coverage
   lint:
@@ -47,8 +46,7 @@ jobs:
           node-version: "18.x"
           cache: "npm"
       - run: npm ci
-      - run: npx solhint "contracts/**/*.sol"
-      - run: npx prettier -c .
+      - run: npm run lint
   slither:
     runs-on: ubuntu-latest
     steps:
