@@ -11,8 +11,6 @@ import {IFxERC20} from "../../tokens/IFxERC20.sol";
 contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     bytes32 public constant DEPOSIT = keccak256("DEPOSIT");
     bytes32 public constant MAP_TOKEN = keccak256("MAP_TOKEN");
-    string public constant SUFFIX_NAME = " (FXERC20)";
-    string public constant PREFIX_SYMBOL = "fx";
 
     // event for token mapping
     event TokenMapped(address indexed rootToken, address indexed childToken);
@@ -77,8 +75,8 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         IFxERC20(childToken).initialize(
             address(this),
             rootToken,
-            string(abi.encodePacked(name, SUFFIX_NAME)),
-            string(abi.encodePacked(PREFIX_SYMBOL, symbol)),
+            name,
+            symbol,
             decimals
         );
 

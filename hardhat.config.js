@@ -1,5 +1,6 @@
 require("dotenv").config();
 require("@nomiclabs/hardhat-ethers")
+require("@nomicfoundation/hardhat-toolbox");
 require('hardhat-deploy');
 
 // You need to export an object to set up your config
@@ -49,7 +50,12 @@ module.exports = {
     },
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY,
+    apiKey: {
+      mainnet: process.env.ETHERSCAN_API_KEY,
+      goerli: process.env.ETHERSCAN_API_KEY,
+      polygon: process.env.POLYGONSCAN_API_KEY,
+      polygonMumbai: process.env.POLYGONSCAN_API_KEY,
+    }
   },
   namedAccounts: {
     deployer: {
