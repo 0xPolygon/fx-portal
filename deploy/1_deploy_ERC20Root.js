@@ -29,7 +29,7 @@ const deployRoot = async function (hre) {
     rootTunnel.address
   );
 
-  log('Setting child tunnel...')
+  log('Setting child tunnel on mainnet root contract...')
 
   await rootTunnelContract.setFxChildTunnel(fxChildAddress)
 
@@ -38,6 +38,10 @@ const deployRoot = async function (hre) {
   if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
     await verify(rootTunnel.address, [checkpointManager, fxRoot, erc20Template])
   }
+
+  log('Please save root address to env...')
+  log(rootTunnel.address)
+  log('----------------------------------------------------')
 }
 
 module.exports = deployRoot

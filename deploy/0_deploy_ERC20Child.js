@@ -23,6 +23,10 @@ const deployChild = async function (hre) {
   if (!developmentChains.includes(network.name) && process.env.ETHERSCAN_API_KEY) {
     await verify(childTunnel.address, [fxChild, erc20Template])
   }
+
+  log('Please save child address to env...')
+  log(childTunnel.address)
+  log('----------------------------------------------------')
 }
 
 module.exports = deployChild
