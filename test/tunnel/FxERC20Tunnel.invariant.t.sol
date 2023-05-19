@@ -28,59 +28,59 @@ contract FxERC20TunnelTest is FxBase {
         targetContract(address(handler));
     }
 
-    function invariantLockedOnRootLtChild() public {
+    function invariant_LockedOnRootLtChild() public {
         assertLe(handler.ghostChildTotalWithdrawals(), handler.ghostRootTotalDeposits());
     }
 
-    function invariantExitedLtLocked() public {
+    function invariant_ExitedLtLocked() public {
         assertLe(handler.ghostChildTotalExits(), handler.ghostRootTotalDeposits());
     }
 
-    function invariantExitedLtWithdrawn() public {
+    function invariant_ExitedLtWithdrawn() public {
         assertLe(handler.ghostChildTotalExits(), handler.ghostChildTotalWithdrawals());
     }
 
-    function invariantAmountOnChildEqLockedOnRoot() public {
+    function invariant_AmountOnChildEqLockedOnRoot() public {
         assertEq(
             handler.reduceActorForAllToken(0, this.accumulateChildTokenBalances) + handler.ghostChildTotalWithdrawals(),
             handler.ghostRootTotalDeposits()
         );
     }
 
-    function invariantConservationOfDeposits() public {
+    function invariant_ConservationOfDeposits() public {
         assertLe(handler.ghostRootTotalDeposits(), handler.reduceActorForAllToken(0, this.accumulateRootTokenDeposits));
     }
 
-    function invariantConservationOfWithdrawals() public {
+    function invariant_ConservationOfWithdrawals() public {
         assertLe(
             handler.ghostChildTotalWithdrawals(),
             handler.reduceActorForAllToken(0, this.accumulateChildTokenWithdrawals)
         );
     }
 
-    function invariantConservationOfExits() public {
+    function invariant_ConservationOfExits() public {
         assertLe(handler.ghostChildTotalExits(), handler.reduceActorForAllToken(0, this.accumulateChildTokenExits));
     }
 
-    function invariantAccountBalances() public {
+    function invariant_AccountBalances() public {
         handler.forEachActorForAllToken(this.assertAccountBalanceLteTotalSupply);
     }
 
-    function invariantConservationOfRootToken() public {
+    function invariant_ConservationOfRootToken() public {
         assertEq(
             handler.reduceToken(0, this.accumulateRootTokenTotalSupply),
             handler.reduceActorForAllToken(0, this.accumulateRootTokenBalances) + handler.getRootTunnelBalance()
         );
     }
 
-    function invariantConservationOfChildToken() public {
+    function invariant_ConservationOfChildToken() public {
         assertEq(
             handler.reduceToken(0, this.accumulateChildTokenTotalSupply),
             handler.reduceActorForAllToken(0, this.accumulateChildTokenBalances) + handler.getChildTunnelBalance()
         );
     }
 
-    function invariantCallSummary() public view {
+    function invariant_CallSummary() public view {
         handler.callSummary();
     }
 

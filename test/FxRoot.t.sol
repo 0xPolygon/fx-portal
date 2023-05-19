@@ -13,17 +13,17 @@ contract FxRootTest is FxBase {
         super.setUp();
     }
 
-    function testSetFxChildAndStateSender() public {
+    function test_SetFxChildAndStateSender() public {
         assertEq(address(fxRoot.fxChild()), address(fxChild));
         assertEq(address(fxRoot.stateSender()), address(stateSender));
     }
 
-    function testCannotSetFxChild() public {
+    function test_CannotSetFxChild() public {
         vm.expectRevert();
         fxRoot.setFxChild(makeAddr("rand"));
     }
 
-    function testSendMessageToChild() public {
+    function test_SendMessageToChild() public {
         vm.startPrank(alice);
         MockMessageProcessor mockTunnel = new MockMessageProcessor();
         bytes memory data = new bytes(0);

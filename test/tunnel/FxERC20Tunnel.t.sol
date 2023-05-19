@@ -16,7 +16,7 @@ contract FxERC20TunnelTest is FxBase {
         super.setUp();
     }
 
-    function testFxRootMapToken() public {
+    function test_FxRootMapToken() public {
         assertEq(erc20ChildTunnel.rootToChildToken(erc20RootToken), address(0));
         assertEq(erc20RootTunnel.rootToChildTokens(erc20RootToken), address(0));
 
@@ -41,7 +41,7 @@ contract FxERC20TunnelTest is FxBase {
         assertEq(childToken.decimals(), rootToken.decimals());
     }
 
-    function testAlreadyMappedRevert() public {
+    function test_AlreadyMappedRevert() public {
         erc20RootTunnel.mapToken(erc20RootToken);
 
         vm.expectRevert("FxERC20RootTunnel: ALREADY_MAPPED");
@@ -60,7 +60,7 @@ contract FxERC20TunnelTest is FxBase {
         fxRoot.sendMessageToChild(address(erc20ChildTunnel), mockMessage);
     }
 
-    function testFxRootDepositWithMapToken() public {
+    function test_FxRootDepositWithMapToken() public {
         FxERC20 childToken = FxERC20(
             computeCreate2Address(
                 keccak256(abi.encodePacked(erc20RootToken)),
@@ -93,7 +93,7 @@ contract FxERC20TunnelTest is FxBase {
         vm.stopPrank();
     }
 
-    function testFxRootDepositAfterMapToken(uint amt) public {
+    function test_FxRootDepositAfterMapToken(uint amt) public {
         erc20RootTunnel.mapToken(erc20RootToken);
         FxERC20 childToken = FxERC20(erc20RootTunnel.rootToChildTokens(erc20RootToken));
 
@@ -118,7 +118,7 @@ contract FxERC20TunnelTest is FxBase {
         vm.stopPrank();
     }
 
-    function testFxChildWithdraw() public {
+    function test_FxChildWithdraw() public {
         uint256 amt = 10 ether;
         uint256 withdrawAmt = 1 ether;
 
@@ -149,7 +149,7 @@ contract FxERC20TunnelTest is FxBase {
         assertEq(childToken.balanceOf(address(erc20ChildTunnel)), 0);
     }
 
-    function testFxChildWithdrawSyncOnRoot() public {
+    function test_FxChildWithdrawSyncOnRoot() public {
         uint256 amt = 10 ether;
         uint256 withdrawAmt = 1 ether;
 
@@ -179,7 +179,7 @@ contract FxERC20TunnelTest is FxBase {
         assertEq(rootToken.balanceOf(address(erc20RootTunnel)), amt - withdrawAmt);
     }
 
-    function testFxChildCannotWithdrawMore() public {
+    function test_FxChildCannotWithdrawMore() public {
         uint256 amt = 10 ether;
 
         depositOnRoot(alice, amt); // alice deposits amt for herself
@@ -206,7 +206,7 @@ contract FxERC20TunnelTest is FxBase {
         assertEq(rootToken.balanceOf(charlie), amt / 2);
     }
 
-    function testFxChildCannotWithdrawUnmappedToken() public {
+    function test_FxChildCannotWithdrawUnmappedToken() public {
         uint256 amt = 10 ether;
 
         FxERC20 rootToken2 = new FxERC20();
