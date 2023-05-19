@@ -7,6 +7,13 @@ cache_path  = 'forge-cache'
 verbosity = 2
 remappings = [
   "@utils=test/utils/",
-  "@openzeppelin/=lib/openzeppelin-contracts/",
-  "@mock=test/mock/"
+  "@handlers=test/handlers/",
+  "@mock=test/mock/",
+  "@openzeppelin/=lib/openzeppelin-contracts/"
 ]
+[invariant]
+fail_on_revert = false
+call_override = false
+dictionary_weight = 80
+include_storage = true
+include_push_bytes = true

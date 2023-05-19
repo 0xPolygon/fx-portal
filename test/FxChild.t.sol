@@ -10,14 +10,14 @@ contract FxChildTest is FxBase {
         super.setUp();
     }
 
-    function testSetFxRoot() public {
+    function test_SetFxRoot() public {
         assertEq(address(fxChild.fxRoot()), address(fxRoot));
 
         vm.expectRevert();
         fxChild.setFxRoot(makeAddr("rand"));
     }
 
-    function testInvalidSenderOnStateReceive() public {
+    function test_InvalidSenderOnStateReceive() public {
         vm.startPrank(alice);
         MockMessageProcessor bob = new MockMessageProcessor();
         bytes memory data = new bytes(0);
