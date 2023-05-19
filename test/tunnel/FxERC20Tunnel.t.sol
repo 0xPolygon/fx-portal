@@ -26,9 +26,9 @@ contract FxERC20TunnelTest is FxBase {
             address(erc20ChildTunnel)
         );
 
-        vm.expectEmit(true, true, true, true, address(erc20ChildTunnel));
+        vm.expectEmit(address(erc20ChildTunnel));
         emit TokenMapped(erc20RootToken, computedChildToken);
-        vm.expectEmit(true, true, true, true, address(erc20RootTunnel));
+        vm.expectEmit(address(erc20RootTunnel));
         emit TokenMappedERC20(erc20RootToken, computedChildToken);
 
         erc20RootTunnel.mapToken(erc20RootToken);
@@ -73,13 +73,13 @@ contract FxERC20TunnelTest is FxBase {
         deal(erc20RootToken, alice, amt);
         FxERC20(erc20RootToken).approve(address(erc20RootTunnel), amt);
 
-        vm.expectEmit(true, true, true, true, address(erc20ChildTunnel));
+        vm.expectEmit(address(erc20ChildTunnel));
         emit TokenMapped(erc20RootToken, address(childToken));
-        vm.expectEmit(true, true, true, true, address(erc20RootTunnel));
+        vm.expectEmit(address(erc20RootTunnel));
         emit TokenMappedERC20(erc20RootToken, address(childToken));
-        vm.expectEmit(true, true, true, true, address(childToken));
+        vm.expectEmit(address(childToken));
         emit Transfer(address(0), bob, amt);
-        vm.expectEmit(true, true, true, true, address(erc20RootTunnel));
+        vm.expectEmit(address(erc20RootTunnel));
         emit FxDepositERC20(erc20RootToken, alice, bob, amt);
 
         erc20RootTunnel.deposit(erc20RootToken, bob /*receiver*/, amt, bytes(""));
@@ -102,9 +102,9 @@ contract FxERC20TunnelTest is FxBase {
         deal(erc20RootToken, alice, amt);
         FxERC20(erc20RootToken).approve(address(erc20RootTunnel), amt);
 
-        vm.expectEmit(true, true, true, true, address(childToken));
+        vm.expectEmit(address(childToken));
         emit Transfer(address(0), bob, amt);
-        vm.expectEmit(true, true, true, true, address(erc20RootTunnel));
+        vm.expectEmit(address(erc20RootTunnel));
         emit FxDepositERC20(erc20RootToken, alice, bob, amt);
 
         erc20RootTunnel.deposit(erc20RootToken, bob /*user*/, amt, bytes(""));
@@ -139,9 +139,9 @@ contract FxERC20TunnelTest is FxBase {
         bytes memory burnMessage = abi.encode(erc20RootToken, address(childToken), bob, withdrawAmt);
 
         vm.prank(bob);
-        vm.expectEmit(true, true, true, true, address(childToken));
+        vm.expectEmit(address(childToken));
         emit Transfer(bob, address(0), withdrawAmt);
-        vm.expectEmit(true, true, true, true, address(erc20ChildTunnel));
+        vm.expectEmit(address(erc20ChildTunnel));
         emit MessageSent(burnMessage);
         erc20ChildTunnel.withdraw(address(childToken), withdrawAmt);
 
@@ -160,9 +160,9 @@ contract FxERC20TunnelTest is FxBase {
         bytes memory burnMessage = abi.encode(erc20RootToken, address(childToken), bob, withdrawAmt);
 
         vm.prank(bob);
-        vm.expectEmit(true, true, true, true, address(childToken));
+        vm.expectEmit(address(childToken));
         emit Transfer(bob, address(0), withdrawAmt);
-        vm.expectEmit(true, true, true, true, address(erc20ChildTunnel));
+        vm.expectEmit(address(erc20ChildTunnel));
         emit MessageSent(burnMessage);
         erc20ChildTunnel.withdraw(address(childToken), withdrawAmt);
 
