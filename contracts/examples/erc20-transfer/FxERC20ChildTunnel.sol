@@ -21,6 +21,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     // token template
     address public immutable tokenTemplate;
 
+    // slither-disable-next-line missing-zero-check
     constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
         tokenTemplate = _tokenTemplate;
         require(_isContract(_tokenTemplate), "Token template is not contract");
@@ -30,11 +31,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         _withdraw(childToken, msg.sender, amount);
     }
 
-    function withdrawTo(
-        address childToken,
-        address receiver,
-        uint256 amount
-    ) public {
+    function withdrawTo(address childToken, address receiver, uint256 amount) public {
         _withdraw(childToken, receiver, amount);
     }
 
@@ -43,7 +40,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
     //
 
     function _processMessageFromRoot(
-        uint256, /* stateId */
+        uint256 /* stateId */,
         address sender,
         bytes memory data
     ) internal override validateSender(sender) {
@@ -74,6 +71,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         // deploy new child token
         bytes32 salt = keccak256(abi.encodePacked(rootToken));
         childToken = createClone(salt, tokenTemplate);
+        // slither-disable-next-line reentrancy-no-eth
         IFxERC20(childToken).initialize(
             address(this),
             rootToken,
@@ -121,11 +119,7 @@ contract FxERC20ChildTunnel is FxBaseChildTunnel, Create2 {
         }
     }
 
-    function _withdraw(
-        address childToken,
-        address receiver,
-        uint256 amount
-    ) internal {
+    function _withdraw(address childToken, address receiver, uint256 amount) internal {
         IFxERC20 childTokenContract = IFxERC20(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();

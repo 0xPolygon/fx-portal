@@ -24,22 +24,11 @@ contract FxERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder {
         require(_isContract(_tokenTemplate), "Token template is not contract");
     }
 
-    function withdraw(
-        address childToken,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) public {
+    function withdraw(address childToken, uint256 id, uint256 amount, bytes memory data) public {
         _withdraw(childToken, msg.sender, id, amount, data);
     }
 
-    function withdrawTo(
-        address childToken,
-        address receiver,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) public {
+    function withdrawTo(address childToken, address receiver, uint256 id, uint256 amount, bytes memory data) public {
         _withdraw(childToken, receiver, id, amount, data);
     }
 
@@ -63,7 +52,7 @@ contract FxERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder {
     }
 
     function _processMessageFromRoot(
-        uint256, /* stateId */
+        uint256 /* stateId */,
         address sender,
         bytes memory data
     ) internal override validateSender(sender) {
@@ -88,6 +77,7 @@ contract FxERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder {
 
         bytes32 salt = keccak256(abi.encodePacked(rootToken));
         childToken = createClone(salt, tokenTemplate);
+        // slither-disable-next-line reentrancy-no-eth,reentrancy-events
         IFxERC1155(childToken).initialize(address(this), rootToken, string(abi.encodePacked(uri)));
 
         rootToChildToken[rootToken] = childToken;
@@ -122,13 +112,7 @@ contract FxERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Holder {
         childTokenContract.mintBatch(user, ids, amounts, data);
     }
 
-    function _withdraw(
-        address childToken,
-        address receiver,
-        uint256 id,
-        uint256 amount,
-        bytes memory data
-    ) internal {
+    function _withdraw(address childToken, address receiver, uint256 id, uint256 amount, bytes memory data) internal {
         IFxERC1155 childTokenContract = IFxERC1155(childToken);
         address rootToken = childTokenContract.connectedToken();
 

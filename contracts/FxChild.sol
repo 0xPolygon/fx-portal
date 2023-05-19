@@ -8,11 +8,7 @@ interface IStateReceiver {
 
 // IFxMessageProcessor represents interface to process message
 interface IFxMessageProcessor {
-    function processMessageFromRoot(
-        uint256 stateId,
-        address rootMessageSender,
-        bytes calldata data
-    ) external;
+    function processMessageFromRoot(uint256 stateId, address rootMessageSender, bytes calldata data) external;
 }
 
 /**

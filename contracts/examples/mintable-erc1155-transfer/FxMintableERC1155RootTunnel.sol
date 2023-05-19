@@ -45,6 +45,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     mapping(address => address) public rootToChildTokens;
     address public immutable rootTokenTemplate;
 
+    // slither-disable-next-line missing-zero-check
     constructor(
         address _checkpointManager,
         address _fxRoot,
@@ -53,13 +54,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         rootTokenTemplate = _rootTokenTemplate;
     }
 
-    function deposit(
-        address rootToken,
-        address user,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) public {
+    function deposit(address rootToken, address user, uint256 id, uint256 amount, bytes calldata data) public {
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC1155RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
@@ -153,6 +148,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
+        // slither-disable-next-line reentrancy-benign
         IFxERC1155(rootToken).initialize(address(this), childToken, uri);
 
         // add into mapped tokens

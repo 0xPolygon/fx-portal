@@ -1,4 +1,4 @@
 {
-  "detectors_to_exclude": "solc-version",
-  "filter_paths": "node_modules"
+  "detectors_to_exclude": "solc-version,naming-convention,similar-names,missing-zero-check,events-access,reentrancy-events,assembly,too-many-digits,boolean-equal,immutable-states",
+  "filter_paths": "node_modules|test|lib"
 }

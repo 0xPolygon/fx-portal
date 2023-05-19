@@ -15,11 +15,7 @@ interface IFxERC721 is IERC721 {
         string memory _symbol
     ) external;
 
-    function mint(
-        address user,
-        uint256 tokenId,
-        bytes memory _data
-    ) external;
+    function mint(address user, uint256 tokenId, bytes memory _data) external;
 
     function burn(uint256 tokenId) external;
 }

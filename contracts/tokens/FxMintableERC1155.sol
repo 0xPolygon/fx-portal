@@ -63,20 +63,12 @@ contract FxMintableERC1155 is ERC1155, IFxMintableERC1155 {
         _mintBatch(user, ids, amounts, data);
     }
 
-    function burn(
-        address user,
-        uint256 id,
-        uint256 amount
-    ) public override {
+    function burn(address user, uint256 id, uint256 amount) public override {
         require(msg.sender == _fxManager, "Invalid sender");
         _burn(user, id, amount);
     }
 
-    function burnBatch(
-        address user,
-        uint256[] calldata ids,
-        uint256[] calldata amounts
-    ) public override {
+    function burnBatch(address user, uint256[] calldata ids, uint256[] calldata amounts) public override {
         require(msg.sender == _fxManager, "Invalid sender");
         _burnBatch(user, ids, amounts);
     }

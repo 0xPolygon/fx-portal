@@ -50,11 +50,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
     // root token template codehash
     bytes32 public immutable rootTokenTemplateCodeHash;
 
-    constructor(
-        address _fxChild,
-        address _childTokenTemplate,
-        address _rootTokenTemplate
-    ) FxBaseChildTunnel(_fxChild) {
+    constructor(address _fxChild, address _childTokenTemplate, address _rootTokenTemplate) FxBaseChildTunnel(_fxChild) {
         require(
             Address.isContract(_childTokenTemplate),
             "FxMintableERC1155ChildTunnel: Token template is not contract"
@@ -89,22 +85,11 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         FxMintableERC1155(childToken).initialize(address(this), rootToken, _uri, msg.sender);
     }
 
-    function withdraw(
-        address childToken,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) public {
+    function withdraw(address childToken, uint256 id, uint256 amount, bytes calldata data) public {
         _withdraw(childToken, msg.sender, id, amount, data);
     }
 
-    function withdrawTo(
-        address childToken,
-        address receiver,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) public {
+    function withdrawTo(address childToken, address receiver, uint256 id, uint256 amount, bytes calldata data) public {
         _withdraw(childToken, receiver, id, amount, data);
     }
 
@@ -132,7 +117,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
     //
 
     function _processMessageFromRoot(
-        uint256, /* stateId */
+        uint256 /* stateId */,
         address sender,
         bytes memory data
     ) internal override validateSender(sender) {
@@ -175,13 +160,7 @@ contract FxMintableERC1155ChildTunnel is FxBaseChildTunnel, Create2, ERC1155Hold
         emit FxBatchDepositMintableERC1155(rootToken, depositor, to, tokenIds, amounts);
     }
 
-    function _withdraw(
-        address childToken,
-        address receiver,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) internal {
+    function _withdraw(address childToken, address receiver, uint256 id, uint256 amount, bytes calldata data) internal {
         FxMintableERC1155 childTokenContract = FxMintableERC1155(childToken);
         address rootToken = childTokenContract.connectedToken();
 
