@@ -21,7 +21,7 @@ contract FxERC20TunnelTest is FxBase {
         selectors[4] = ERC20Handler.transferRoot.selector;
         selectors[5] = ERC20Handler.transferChild.selector;
 
-        handler = new ERC20Handler(erc20RootTunnel, erc20ChildTunnel);
+        handler = new ERC20Handler(root.erc20Tunnel, child.erc20Tunnel);
 
         targetSelector(FuzzSelector({addr: address(handler), selectors: selectors}));
 

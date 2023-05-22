@@ -12,20 +12,70 @@ import {FxERC20ChildTunnel} from "contracts/examples/erc20-transfer/FxERC20Child
 import {FxERC20RootTunnel} from "contracts/examples/erc20-transfer/FxERC20RootTunnel.sol";
 import {FxERC20} from "contracts/tokens/FxERC20.sol";
 
+import {FxERC721ChildTunnel} from "contracts/examples/erc721-transfer/FxERC721ChildTunnel.sol";
+import {FxERC721RootTunnel} from "contracts/examples/erc721-transfer/FxERC721RootTunnel.sol";
+import {FxERC721} from "contracts/tokens/FxERC721.sol";
+
+import {FxERC1155ChildTunnel} from "contracts/examples/erc1155-transfer/FxERC1155ChildTunnel.sol";
+import {FxERC1155RootTunnel} from "contracts/examples/erc1155-transfer/FxERC1155RootTunnel.sol";
+import {FxERC1155} from "contracts/tokens/FxERC1155.sol";
+
+import {FxMintableERC20ChildTunnel} from "contracts/examples/mintable-erc20-transfer/FxMintableERC20ChildTunnel.sol";
+import {FxMintableERC20RootTunnel} from "contracts/examples/mintable-erc20-transfer/FxMintableERC20RootTunnel.sol";
+import {FxMintableERC20} from "contracts/tokens/FxMintableERC20.sol";
+
+import {FxMintableERC721ChildTunnel} from "contracts/examples/mintable-erc721-transfer/FxMintableERC721ChildTunnel.sol";
+import {FxMintableERC721RootTunnel} from "contracts/examples/mintable-erc721-transfer/FxMintableERC721RootTunnel.sol";
+import {FxMintableERC721} from "contracts/tokens/FxMintableERC721.sol";
+
+import {FxMintableERC1155ChildTunnel} from "contracts/examples/mintable-erc1155-transfer/FxMintableERC1155ChildTunnel.sol";
+import {FxMintableERC1155RootTunnel} from "contracts/examples/mintable-erc1155-transfer/FxMintableERC1155RootTunnel.sol";
+import {FxMintableERC1155} from "contracts/tokens/FxMintableERC1155.sol";
+
+import {MockERC20RootTunnel} from "../mock/RootTunnel.sol";
+
 contract FxBase is Test, Events {
     FxRoot public fxRoot;
     FxChild public fxChild;
     MockStateSender public stateSender;
     MockStateReceiver public stateReceiver;
+
     address public manager = makeAddr("manager");
-
     address public MATIC = 0x0000000000000000000000000000000000001001;
+    address public checkpointManager = makeAddr("checkpointManager");
 
-    address public checkpointManager = 0x600e7E2B520D51a7FE5e404E73Fb0D98bF2A913E; // @TODO
-    address public erc20RootToken;
-    address public erc20ChildToken;
-    FxERC20ChildTunnel public erc20ChildTunnel;
-    FxERC20RootTunnel public erc20RootTunnel;
+    struct RootContracts {
+        FxERC20 erc20Token;
+        FxERC20RootTunnel erc20Tunnel;
+        FxMintableERC20 erc20MintableToken;
+        FxMintableERC20RootTunnel erc20MintableTunnel;
+        FxERC721 erc721Token;
+        FxERC721RootTunnel erc721Tunnel;
+        FxMintableERC721 erc721MintableToken;
+        FxMintableERC721RootTunnel erc721MintableTunnel;
+        FxERC1155 erc1155Token;
+        FxERC1155RootTunnel erc1155Tunnel;
+        FxMintableERC1155 erc1155MintableToken;
+        FxMintableERC1155RootTunnel erc1155MintableTunnel;
+    }
+
+    struct ChildContracts {
+        FxERC20 erc20Token;
+        FxERC20ChildTunnel erc20Tunnel;
+        FxMintableERC20 erc20MintableToken;
+        FxMintableERC20ChildTunnel erc20MintableTunnel;
+        FxERC721 erc721Token;
+        FxERC721ChildTunnel erc721Tunnel;
+        FxMintableERC721 erc721MintableToken;
+        FxMintableERC721ChildTunnel erc721MintableTunnel;
+        FxERC1155 erc1155Token;
+        FxERC1155ChildTunnel erc1155Tunnel;
+        FxMintableERC1155 erc1155MintableToken;
+        FxMintableERC1155ChildTunnel erc1155MintableTunnel;
+    }
+
+    RootContracts public root;
+    ChildContracts public child;
 
     function setUp() public virtual {
         fxChild = new FxChild();
@@ -42,14 +92,14 @@ contract FxBase is Test, Events {
 
         vm.startPrank(manager);
 
-        FxERC20 fxERC20 = new FxERC20();
-        erc20RootToken = address(fxERC20);
-        erc20ChildTunnel = new FxERC20ChildTunnel(address(fxChild), erc20RootToken);
-        fxERC20.initialize(manager, address(erc20ChildTunnel), "FxERC20", "FE2", 18);
+        root.erc20Token = new FxERC20();
+        child.erc20Tunnel = new FxERC20ChildTunnel(address(fxChild), address(root.erc20Token));
+        root.erc20Token.initialize(manager, address(child.erc20Tunnel), "FxERC20", "FE2", 18);
 
-        erc20RootTunnel = new MockERC20RootTunnel(checkpointManager, address(fxRoot), erc20RootToken);
-        erc20RootTunnel.setFxChildTunnel(address(erc20ChildTunnel));
-        erc20ChildTunnel.setFxRootTunnel(address(erc20RootTunnel));
+        root.erc20Tunnel = new MockERC20RootTunnel(checkpointManager, address(fxRoot), address(root.erc20Token));
+        root.erc20Tunnel.setFxChildTunnel(address(child.erc20Tunnel));
+        child.erc20Tunnel.setFxRootTunnel(address(root.erc20Tunnel));
+
         vm.stopPrank();
     }
 }
@@ -59,17 +109,5 @@ contract MockMessageProcessor {
 
     function processMessageFromRoot(uint256 stateId, address rootMessageSender, bytes calldata data) public {
         emit MessageProcessed(stateId, rootMessageSender, data);
-    }
-}
-
-contract MockERC20RootTunnel is FxERC20RootTunnel {
-    constructor(
-        address _checkpointManager,
-        address _fxRoot,
-        address _fxERC20Token
-    ) FxERC20RootTunnel(_checkpointManager, _fxRoot, _fxERC20Token) {}
-
-    function receiveMessage(bytes memory message) public virtual override {
-        _processMessageFromChild(message);
     }
 }
