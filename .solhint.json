@@ -19,6 +19,7 @@
         "maxLength": 64
       }
     ],
+    "func-name-mixedcase": "off",
     "no-inline-assembly": "off"
   }
 }
