@@ -94,13 +94,14 @@ contract FxMintableERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receive
 
         // check if current token has been minted on root chain
         IFxERC721 nft = IFxERC721(rootToken);
-        address currentOwner = nft.ownerOf(tokenId);
-        if (currentOwner == address(0)) {
-            nft.mint(address(this), tokenId, "");
+        try nft.ownerOf(tokenId) returns (address currentOwner) {
+            require(currentOwner == address(this), "FxMintableERC721RootTunnel: TOKEN_NOT_MINTABLE_ON_ROOT");
+        } catch (bytes memory) {
+            nft.mint(address(this), tokenId, ""); // transferData passed later
         }
 
         // transfer from tokens to
-        IFxERC721(rootToken).safeTransferFrom(address(this), to, tokenId, syncData);
+        nft.safeTransferFrom(address(this), to, tokenId, syncData);
         emit FxWithdrawMintableERC721(rootToken, childToken, to, tokenId);
     }
 
