@@ -156,7 +156,7 @@ contract FxERC20TunnelTest is FxBase {
 
         FxERC20 childToken = FxERC20(root.erc20Tunnel.rootToChildTokens(address(root.erc20Token)));
 
-        bytes memory burnMessage = abi.encode(address(root.erc20Token), address(childToken), bob, withdrawAmt);
+        bytes memory burnMessage = abi.encode(address(root.erc20Token), address(childToken), alice, withdrawAmt);
 
         vm.prank(bob);
         vm.expectEmit(address(childToken));
