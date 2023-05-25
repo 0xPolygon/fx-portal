@@ -108,7 +108,7 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
         uint256 amount
     ) public useActor(actorSeed) useToken(tokenSeed) countCall("withdrawOnChild") {
         vm.assume(childTokenExists(currentToken.root));
-        amount = bound(amount, 0, currentToken.child.balanceOf(currentActor));
+        vm.assume((amount = bound(amount, 0, currentToken.child.balanceOf(currentActor))) > 0);
 
         vm.prank(currentActor);
         erc20ChildTunnel.withdraw(address(currentToken.child), amount);
@@ -127,7 +127,7 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
         uint256 amount
     ) public useActor(actorSeed) useToken(tokenSeed) countCall("withdrawOnChildAndExit") {
         vm.assume(childTokenExists(currentToken.root));
-        amount = bound(amount, 0, currentToken.child.balanceOf(currentActor));
+        vm.assume((amount = bound(amount, 0, currentToken.child.balanceOf(currentActor))) > 0);
 
         uint256 childTokenBalanceBefore = currentToken.child.balanceOf(currentActor);
         uint256 rootTokenBalanceBefore = currentToken.root.balanceOf(currentActor);
