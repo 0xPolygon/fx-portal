@@ -163,18 +163,19 @@ contract FxERC20TunnelTest is FxBase {
         emit Transfer(bob, address(0), withdrawAmt);
         vm.expectEmit(address(child.erc20Tunnel));
         emit MessageSent(burnMessage);
-        child.erc20Tunnel.withdraw(address(childToken), withdrawAmt);
+        child.erc20Tunnel.withdrawTo(address(childToken), alice, withdrawAmt);
 
         assertEq(childToken.balanceOf(bob), amt - withdrawAmt);
         assertEq(childToken.balanceOf(address(child.erc20Tunnel)), 0);
 
         FxERC20 rootToken = root.erc20Token;
         assertEq(rootToken.balanceOf(bob), 0);
+        assertEq(rootToken.balanceOf(alice), 0);
         assertEq(rootToken.balanceOf(address(root.erc20Tunnel)), amt);
 
         root.erc20Tunnel.receiveMessage(burnMessage); // submit burn proof
 
-        assertEq(rootToken.balanceOf(bob), withdrawAmt);
+        assertEq(rootToken.balanceOf(alice), withdrawAmt);
         assertEq(rootToken.balanceOf(address(root.erc20Tunnel)), amt - withdrawAmt);
     }
 
@@ -228,7 +229,20 @@ contract FxERC20TunnelTest is FxBase {
         root.erc20Tunnel.deposit(address(rootToken2), alice, amt, bytes(""));
 
         child.erc20Tunnel.withdraw(address(childToken2), amt);
+        root.erc20Tunnel.receiveMessage(abi.encode(address(rootToken2), address(childToken2), alice, amt));
+        rootToken2.approve(address(root.erc20Tunnel), amt);
+        root.erc20Tunnel.deposit(address(rootToken2), address(fxChild), amt, NULL_DATA);
         vm.stopPrank();
+    }
+
+    function test_InvalidSyncType() public {
+        bytes32 randomSyncType = keccak256("0x1337");
+        bytes memory message = abi.encode(randomSyncType, abi.encode(0));
+        vm.expectRevert("FxERC20ChildTunnel: INVALID_SYNC_TYPE");
+        stateSender.syncState(
+            address(child.erc20Tunnel),
+            abi.encode(address(root.erc20Tunnel), address(child.erc20Tunnel), message)
+        );
     }
 
     function depositOnRoot(address who, uint256 amt) internal {
