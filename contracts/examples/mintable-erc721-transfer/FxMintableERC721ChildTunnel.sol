@@ -134,7 +134,7 @@ contract FxMintableERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Recei
             "FxMintableERC721ChildTunnel: NO_MAPPED_TOKEN"
         );
 
-        require(msg.sender == childTokenContract.ownerOf(tokenId));
+        require(msg.sender == childTokenContract.ownerOf(tokenId), "FxMintableERC721ChildTunnel: INVALID_OWNER");
 
         // withdraw tokens
         childTokenContract.burn(tokenId);
