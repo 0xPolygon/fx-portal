@@ -252,6 +252,29 @@ contract FxMintableERC20TunnelTest is FxBase, Create2 {
         );
     }
 
+    function test_FxChildContractReceiver() public {
+        uint256 amt = 1e10;
+        vm.startPrank(manager);
+        child.erc20MintableTunnel.deployChildToken(uniqueId, "FxMintableerc20", "FM1", 18);
+        childToken.mintToken(alice, amt);
+        vm.stopPrank();
+
+        vm.startPrank(alice);
+        child.erc20MintableTunnel.withdraw(address(childToken), amt);
+        root.erc20MintableTunnel.receiveMessage(
+            abi.encode(
+                address(rootToken),
+                address(childToken),
+                alice,
+                amt,
+                abi.encode(childToken.name(), childToken.symbol(), childToken.decimals())
+            )
+        );
+        rootToken.approve(address(root.erc20MintableTunnel), amt);
+        root.erc20MintableTunnel.deposit(address(rootToken), address(fxChild), amt, NULL_DATA);
+        vm.stopPrank();
+    }
+
     function test_FxRootTokenCreationMismatch() public {
         vm.prank(manager);
         child.erc20MintableTunnel.deployChildToken(uniqueId, "FxMintableERC20", "FM1", 18);
