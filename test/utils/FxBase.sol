@@ -32,7 +32,7 @@ import {FxMintableERC1155ChildTunnel} from "contracts/examples/mintable-erc1155-
 import {FxMintableERC1155RootTunnel} from "contracts/examples/mintable-erc1155-transfer/FxMintableERC1155RootTunnel.sol";
 import {FxMintableERC1155} from "contracts/tokens/FxMintableERC1155.sol";
 
-import {MockERC20RootTunnel} from "../mock/RootTunnel.sol";
+import {MockERC20RootTunnel, MockMintableERC20RootTunnel, MockERC721RootTunnel, MockMintableERC721RootTunnel, MockERC1155RootTunnel, MockMintableERC1155RootTunnel} from "../mock/RootTunnel.sol";
 
 contract FxBase is Test, Events {
     FxRoot public fxRoot;
@@ -43,6 +43,8 @@ contract FxBase is Test, Events {
     address public manager = makeAddr("manager");
     address public MATIC = 0x0000000000000000000000000000000000001001;
     address public checkpointManager = makeAddr("checkpointManager");
+    bytes32 public uniqueId = keccak256("uniqueId");
+    bytes public constant NULL_DATA = new bytes(0);
 
     struct RootContracts {
         FxERC20 erc20Token;
@@ -94,11 +96,69 @@ contract FxBase is Test, Events {
 
         root.erc20Token = new FxERC20();
         child.erc20Tunnel = new FxERC20ChildTunnel(address(fxChild), address(root.erc20Token));
-        root.erc20Token.initialize(manager, address(child.erc20Tunnel), "FxERC20", "FE2", 18);
-
+        root.erc20Token.initialize(manager, address(child.erc20Tunnel), "FxERC20", "FE1", 18);
         root.erc20Tunnel = new MockERC20RootTunnel(checkpointManager, address(fxRoot), address(root.erc20Token));
         root.erc20Tunnel.setFxChildTunnel(address(child.erc20Tunnel));
         child.erc20Tunnel.setFxRootTunnel(address(root.erc20Tunnel));
+
+        FxMintableERC20 erc20MintableToken = new FxMintableERC20();
+        FxERC20 erc20Token = new FxERC20();
+        child.erc20MintableTunnel = new FxMintableERC20ChildTunnel(
+            address(fxChild),
+            address(erc20MintableToken),
+            address(erc20Token)
+        );
+        root.erc20MintableTunnel = new MockMintableERC20RootTunnel(
+            checkpointManager,
+            address(fxRoot),
+            address(erc20Token)
+        );
+        root.erc20MintableTunnel.setFxChildTunnel(address(child.erc20MintableTunnel));
+        child.erc20MintableTunnel.setFxRootTunnel(address(root.erc20MintableTunnel));
+
+        root.erc721Token = new FxERC721();
+        child.erc721Tunnel = new FxERC721ChildTunnel(address(fxChild), address(root.erc721Token));
+        root.erc721Token.initialize(manager, address(child.erc721Tunnel), "FxERC721", "FE2");
+        root.erc721Tunnel = new MockERC721RootTunnel(checkpointManager, address(fxRoot), address(root.erc721Token));
+        root.erc721Tunnel.setFxChildTunnel(address(child.erc721Tunnel));
+        child.erc721Tunnel.setFxRootTunnel(address(root.erc721Tunnel));
+
+        FxMintableERC721 erc721MintableToken = new FxMintableERC721();
+        FxERC721 erc721Token = new FxERC721();
+        child.erc721MintableTunnel = new FxMintableERC721ChildTunnel(
+            address(fxChild),
+            address(erc721MintableToken),
+            address(erc721Token)
+        );
+        root.erc721MintableTunnel = new MockMintableERC721RootTunnel(
+            checkpointManager,
+            address(fxRoot),
+            address(erc721Token)
+        );
+        root.erc721MintableTunnel.setFxChildTunnel(address(child.erc721MintableTunnel));
+        child.erc721MintableTunnel.setFxRootTunnel(address(root.erc721MintableTunnel));
+
+        root.erc1155Token = new FxERC1155();
+        child.erc1155Tunnel = new FxERC1155ChildTunnel(address(fxChild), address(root.erc1155Token));
+        root.erc1155Token.initialize(manager, address(child.erc1155Tunnel), "ipfs://");
+        root.erc1155Tunnel = new MockERC1155RootTunnel(checkpointManager, address(fxRoot), address(root.erc1155Token));
+        root.erc1155Tunnel.setFxChildTunnel(address(child.erc1155Tunnel));
+        child.erc1155Tunnel.setFxRootTunnel(address(root.erc1155Tunnel));
+
+        FxMintableERC1155 erc1155MintableToken = new FxMintableERC1155();
+        FxERC1155 erc1155Token = new FxERC1155();
+        child.erc1155MintableTunnel = new FxMintableERC1155ChildTunnel(
+            address(fxChild),
+            address(erc1155MintableToken),
+            address(erc1155Token)
+        );
+        root.erc1155MintableTunnel = new MockMintableERC1155RootTunnel(
+            checkpointManager,
+            address(fxRoot),
+            address(erc1155Token)
+        );
+        root.erc1155MintableTunnel.setFxChildTunnel(address(child.erc1155MintableTunnel));
+        child.erc1155MintableTunnel.setFxRootTunnel(address(root.erc1155MintableTunnel));
 
         vm.stopPrank();
     }
