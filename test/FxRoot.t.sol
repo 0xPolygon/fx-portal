@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 import {FxBase, MockMessageProcessor} from "@utils/FxBase.sol";
+import {FxRoot} from "contracts/FxRoot.sol";
+import {FxChild} from "contracts/FxChild.sol";
 
 contract FxRootTest is FxBase {
     address public alice = makeAddr("alice");
@@ -14,8 +16,14 @@ contract FxRootTest is FxBase {
     }
 
     function test_SetFxChildAndStateSender() public {
-        assertEq(address(fxRoot.fxChild()), address(fxChild));
-        assertEq(address(fxRoot.stateSender()), address(stateSender));
+        FxChild fxChild2 = new FxChild();
+        FxRoot fxRoot2 = new FxRoot(address(stateSender));
+
+        fxRoot2.setFxChild(address(fxChild2));
+        fxChild2.setFxRoot(address(fxRoot2));
+
+        assertEq(address(fxRoot2.fxChild()), address(fxChild2));
+        assertEq(address(fxRoot2.stateSender()), address(stateSender));
     }
 
     function test_CannotSetFxChild() public {

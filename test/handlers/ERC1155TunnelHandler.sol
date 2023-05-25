@@ -6,25 +6,25 @@ import {StdCheats} from "forge-std/StdCheats.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 import {console2 as console} from "forge-std/console2.sol";
 import {AddressSet, LibAddressSet} from "@utils/AddressSet.sol";
-import {FxERC20ChildTunnel} from "contracts/examples/erc20-transfer/FxERC20ChildTunnel.sol";
-import {FxERC20RootTunnel} from "contracts/examples/erc20-transfer/FxERC20RootTunnel.sol";
-import {IFxERC20} from "contracts/tokens/IFxERC20.sol";
-import {FxERC20} from "contracts/tokens/FxERC20.sol";
+import {FxERC1155ChildTunnel} from "contracts/examples/erc1155-transfer/FxERC1155ChildTunnel.sol";
+import {FxERC1155RootTunnel} from "contracts/examples/erc1155-transfer/FxERC1155RootTunnel.sol";
+import {IFxERC1155} from "contracts/tokens/IFxERC1155.sol";
+import {FxERC1155} from "contracts/tokens/FxERC1155.sol";
 
 uint256 constant MAX_BALANCE = 1e20;
 uint256 constant NUM_TOKENS = 5;
 bytes constant NULL_DATA = new bytes(0);
 struct Token {
-    IFxERC20 root;
-    IFxERC20 child;
+    IFxERC1155 root;
+    IFxERC1155 child;
 }
 
-contract ERC20Handler is CommonBase, StdCheats, StdUtils {
+contract ERC1155Handler is CommonBase, StdCheats, StdUtils {
     address public immutable manager = makeAddr("manager");
     using LibAddressSet for AddressSet;
 
-    FxERC20ChildTunnel public erc20ChildTunnel;
-    FxERC20RootTunnel public erc20RootTunnel;
+    FxERC1155ChildTunnel public erc1155ChildTunnel;
+    FxERC1155RootTunnel public erc1155RootTunnel;
     Token[] public tokens;
 
     bytes[] public pendingWithdrawalProofs;
@@ -65,20 +65,20 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
         _;
     }
 
-    constructor(FxERC20RootTunnel _erc20RootTunnel, FxERC20ChildTunnel _erc20ChildTunnel) {
-        erc20RootTunnel = _erc20RootTunnel;
-        erc20ChildTunnel = _erc20ChildTunnel;
+    constructor(FxERC1155RootTunnel _erc1155RootTunnel, FxERC1155ChildTunnel _erc1155ChildTunnel) {
+        erc1155RootTunnel = _erc1155RootTunnel;
+        erc1155ChildTunnel = _erc1155ChildTunnel;
 
         vm.startPrank(manager);
-        bytes32 tokenCodeHash = erc20RootTunnel.childTokenTemplateCodeHash();
+        bytes32 tokenCodeHash = erc1155RootTunnel.childTokenTemplateCodeHash();
         for (uint256 i; i < NUM_TOKENS; i++) {
-            IFxERC20 root = new FxERC20();
-            root.initialize(manager, address(erc20ChildTunnel), "FxERC20", vm.toString(i), 18);
-            IFxERC20 child = IFxERC20(
+            IFxERC1155 root = new FxERC1155();
+            root.initialize(manager, address(erc1155ChildTunnel), "ipfs://");
+            IFxERC1155 child = IFxERC1155(
                 computeCreate2Address(
                     keccak256(abi.encodePacked(address(root))),
                     tokenCodeHash,
-                    address(erc20ChildTunnel)
+                    address(erc1155ChildTunnel)
                 )
             );
             tokens.push(Token({root: root, child: child}));
@@ -88,14 +88,16 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
 
     function depositOnRoot(
         uint256 tokenSeed,
+        uint256 tokenId,
         uint256 amount
     ) public createActor useToken(tokenSeed) countCall("depositOnRoot") {
-        amount = bound(amount, 0, MAX_BALANCE - currentToken.root.balanceOf(currentActor));
-        deal(address(currentToken.root), currentActor, amount, true);
+        amount = bound(amount, 0, MAX_BALANCE - currentToken.root.balanceOf(currentActor, tokenId));
+        vm.prank(manager);
+        currentToken.root.mint(currentActor, tokenId, amount, NULL_DATA);
 
         vm.startPrank(currentActor);
-        currentToken.root.approve(address(erc20RootTunnel), amount);
-        erc20RootTunnel.deposit(address(currentToken.root), currentActor, amount, NULL_DATA);
+        currentToken.root.setApprovalForAll(address(erc1155RootTunnel), true);
+        erc1155RootTunnel.deposit(address(currentToken.root), currentActor, tokenId, amount, NULL_DATA);
         vm.stopPrank();
 
         ghostRootTotalDeposits += amount;
@@ -105,16 +107,17 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
     function withdrawOnChild(
         uint256 actorSeed,
         uint256 tokenSeed,
+        uint256 tokenId,
         uint256 amount
     ) public useActor(actorSeed) useToken(tokenSeed) countCall("withdrawOnChild") {
         vm.assume(childTokenExists(currentToken.root));
-        vm.assume((amount = bound(amount, 0, currentToken.child.balanceOf(currentActor))) > 0);
+        vm.assume((amount = bound(amount, 0, currentToken.child.balanceOf(currentActor, tokenId))) > 0);
 
         vm.prank(currentActor);
-        erc20ChildTunnel.withdraw(address(currentToken.child), amount);
+        erc1155ChildTunnel.withdraw(address(currentToken.child), tokenId, amount, NULL_DATA);
 
         pendingWithdrawalProofs.push(
-            abi.encode(address(currentToken.root), address(currentToken.root), currentActor, amount)
+            abi.encode(address(currentToken.root), address(currentToken.root), currentActor, tokenId, amount, NULL_DATA)
         );
 
         ghostChildTotalWithdrawals += amount;
@@ -124,23 +127,18 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
     function withdrawOnChildAndExit(
         uint256 actorSeed,
         uint256 tokenSeed,
+        uint256 tokenId,
         uint256 amount
-    ) public useActor(actorSeed) useToken(tokenSeed) countCall("withdrawOnChildAndExit") {
+    ) public useActor(actorSeed) useToken(tokenSeed) countCall("withdrawOnChild") {
         vm.assume(childTokenExists(currentToken.root));
-        vm.assume((amount = bound(amount, 0, currentToken.child.balanceOf(currentActor))) > 0);
+        vm.assume((amount = bound(amount, 0, currentToken.child.balanceOf(currentActor, tokenId))) > 0);
 
-        uint256 childTokenBalanceBefore = currentToken.child.balanceOf(currentActor);
-        uint256 rootTokenBalanceBefore = currentToken.root.balanceOf(currentActor);
+        vm.prank(currentActor);
+        erc1155ChildTunnel.withdraw(address(currentToken.child), tokenId, amount, NULL_DATA);
 
-        vm.startPrank(currentActor);
-        erc20ChildTunnel.withdraw(address(currentToken.child), amount);
-        vm.stopPrank();
-
-        assert(currentToken.child.balanceOf(currentActor) == childTokenBalanceBefore - amount);
-        erc20RootTunnel.receiveMessage(
-            abi.encode(address(currentToken.root), address(currentToken.root), currentActor, amount)
+        erc1155RootTunnel.receiveMessage(
+            abi.encode(address(currentToken.root), address(currentToken.root), currentActor, tokenId, amount, NULL_DATA)
         );
-        assert(currentToken.root.balanceOf(currentActor) == rootTokenBalanceBefore + amount);
 
         ghostChildTotalWithdrawals += amount;
         ghostChildTokenWithdrawals[currentActor][address(currentToken.child)] += amount;
@@ -153,43 +151,16 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
         uint num = pendingWithdrawalProofs.length;
         vm.assume(num > 0);
         for (uint i; i < num; i++) {
-            erc20RootTunnel.receiveMessage(pendingWithdrawalProofs[i]);
+            erc1155RootTunnel.receiveMessage(pendingWithdrawalProofs[i]);
 
-            (, address childToken, address who, uint256 amount) = abi.decode(
+            (, address childToken, address who, , uint256 amount, ) = abi.decode(
                 pendingWithdrawalProofs[i],
-                (address, address, address, uint256)
+                (address, address, address, uint256, uint256, bytes)
             );
 
             ghostChildTotalExits += amount;
             ghostChildTokenExits[who][address(childToken)] += amount;
         }
-    }
-
-    function transferRoot(
-        uint256 actorSeed,
-        uint256 tokenSeed,
-        uint256 toSeed,
-        uint256 amount
-    ) public useActor(actorSeed) useToken(tokenSeed) countCall("transferRoot") {
-        amount = bound(amount, 0, currentToken.root.balanceOf(currentActor));
-        address to = actors.rand(toSeed);
-
-        vm.prank(currentActor);
-        currentToken.root.transferFrom(currentActor, to, amount);
-    }
-
-    function transferChild(
-        uint256 actorSeed,
-        uint256 tokenSeed,
-        uint256 toSeed,
-        uint256 amount
-    ) public useActor(actorSeed) useToken(tokenSeed) countCall("transferChild") {
-        vm.assume(childTokenExists(currentToken.root));
-        amount = bound(amount, 0, currentToken.child.balanceOf(currentActor));
-        address to = actors.rand(toSeed);
-
-        vm.prank(currentActor);
-        currentToken.child.transferFrom(currentActor, to, amount);
     }
 
     function getTokens() external view returns (Token[] memory) {
@@ -227,22 +198,8 @@ contract ERC20Handler is CommonBase, StdCheats, StdUtils {
         return acc;
     }
 
-    function getRootTunnelBalance() public view returns (uint256 ret) {
-        for (uint i; i < tokens.length; i++) {
-            ret += tokens[i].root.balanceOf(address(erc20RootTunnel));
-        }
-    }
-
-    function getChildTunnelBalance() public view returns (uint256 ret) {
-        for (uint i; i < tokens.length; i++) {
-            if (childTokenExists(tokens[i].root)) {
-                ret += tokens[i].child.balanceOf(address(erc20ChildTunnel));
-            }
-        }
-    }
-
-    function childTokenExists(IFxERC20 rootToken) public view returns (bool) {
-        return erc20RootTunnel.rootToChildTokens(address(rootToken)) != address(0);
+    function childTokenExists(IFxERC1155 rootToken) public view returns (bool) {
+        return erc1155RootTunnel.rootToChildTokens(address(rootToken)) != address(0);
     }
 
     function callSummary() external view {
