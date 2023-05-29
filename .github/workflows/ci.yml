@@ -33,6 +33,8 @@ jobs:
         with:
           node-version: "16.x"
           cache: "yarn"
+      - name: Setup
+        run: yarn
       - name: Build
         run: yarn build
       - name: Run tests
