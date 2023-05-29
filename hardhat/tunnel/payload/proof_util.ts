@@ -125,7 +125,7 @@ export class ProofUtil {
             : "0x"
           : receipt.root
       ),
-      ethUtils.toBuffer(receipt.cumulativeGasUsed),
+      ethUtils.toBuffer(receipt.cumulativeGasUsed.toHexString()),
       ethUtils.toBuffer(receipt.logsBloom),
       // encoded log array
       receipt.logs?.map((l: any) => {
