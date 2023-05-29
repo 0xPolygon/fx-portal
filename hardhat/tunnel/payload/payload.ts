@@ -1,8 +1,8 @@
 import { ethers } from "hardhat";
-import axios, { AxiosResponse } from "axios";
 import { ProofUtil } from "./proof_util";
-import { ITransactionReceipt } from "./interface";
+import { IBaseBlock } from "./interface";
 import ethUtils from "ethereumjs-util";
+import { MerkleTree } from "./merkle_tree";
 
 function getLogIndex_(logEventSig: string, receipt: any) {
   let logIndex = -1;
@@ -89,49 +89,107 @@ function buildBlockProof(
   });
 }
 
+export async function getHeaders(
+  start: number,
+  end: number,
+  provider: typeof ethers.provider
+) {
+  if (start >= end) {
+    return [];
+  }
+  let current = start;
+  let p = [];
+  let result = [];
+  while (current <= end) {
+    p = [];
+    for (let i = 0; i < 10 && current <= end; i++) {
+      p.push(
+        ethers.provider.send("eth_getBlockByNumber", [
+          ethers.utils.hexValue(current),
+          true,
+        ])
+      );
+      current++;
+    }
+    if (p.length > 0) {
+      result.push(...(await Promise.all(p)));
+    }
+  }
+  return result.map(getBlockHeader);
+}
+
+export function getBlockHeader(block: IBaseBlock) {
+  // const n = new ethUtils.BN(block.number).toArrayLike(Buffer, 'be', 32)
+  // const ts = new ethUtils.BN(block.timestamp).toArrayLike(Buffer, 'be', 32)
+  const n = ethUtils.toBuffer(ethUtils.setLengthLeft(block.number, 32));
+  const ts = ethUtils.toBuffer(ethUtils.setLengthLeft(block.timestamp, 32));
+
+  const txRoot = ethUtils.toBuffer(block.transactionsRoot);
+  const receiptsRoot = ethUtils.toBuffer(block.receiptsRoot);
+
+  return ethUtils.keccak256(Buffer.concat([n, ts, txRoot, receiptsRoot]));
+}
+
 export async function buildPayloadForExit(
   burnTxHash: string,
-  logEventSig: string,
-  isFast: boolean
+  logEventSig = "0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036",
+  isFast = false
 ) {
-  const requestConcurrency: number = 0;
+  const requestConcurrency = 0;
   const receipt = await ethers.provider.getTransactionReceipt(burnTxHash);
   const block = await ethers.provider.send("eth_getBlockByNumber", [
     ethers.utils.hexValue(receipt.blockNumber),
     true,
   ]);
   const rootBlockInfo = {
-    start: 0,
-    end: 1000,
+    start: parseInt(block.number) - 1,
+    end: parseInt(block.number),
     headerBlockNumber: 500,
   };
 
-  const blockProof: any = await buildBlockProof(
-    ethers.provider,
+  const headers = await getHeaders(
     rootBlockInfo.start,
     rootBlockInfo.end,
-    block.number as number
+    ethers.provider
   );
-  console.log(blockProof);
+  const tree = new MerkleTree(headers);
+
+  const fullBlockHeader = getBlockHeader(
+    (await ethers.provider.send("eth_getBlockByNumber", [
+      ethers.utils.hexValue(block.number),
+      true,
+    ])) as unknown as IBaseBlock
+  );
+
+  const blockProofBuffer = tree.getProof(fullBlockHeader);
+  const blockProof = ethUtils.bufferToHex(Buffer.concat(blockProofBuffer));
 
   const receiptProof: any = await ProofUtil.getReceiptProof(
     receipt,
     block,
-    requestConcurrency
+    requestConcurrency,
+    await Promise.all(
+      block.transactions.map((tx: any) =>
+        ethers.provider.getTransactionReceipt(tx.hash)
+      )
+    )
   );
 
   const logIndex = getLogIndex_(logEventSig, receipt);
 
-  return encodePayload_(
-    rootBlockInfo.headerBlockNumber,
-    blockProof,
-    block.number,
-    block.timestamp,
-    Buffer.from(block.transactionsRoot.slice(2), "hex"),
-    Buffer.from(block.receiptsRoot.slice(2), "hex"),
-    ProofUtil.getReceiptBytes(receipt), // rlp encoded
-    receiptProof.parentNodes,
-    receiptProof.path,
-    logIndex
-  );
+  return {
+    burnProof: encodePayload_(
+      rootBlockInfo.headerBlockNumber,
+      blockProof,
+      block.number,
+      block.timestamp,
+      Buffer.from(block.transactionsRoot.slice(2), "hex"),
+      Buffer.from(block.receiptsRoot.slice(2), "hex"),
+      ProofUtil.getReceiptBytes(receipt), // rlp encoded
+      receiptProof.parentNodes,
+      receiptProof.path,
+      logIndex
+    ),
+    root: ethUtils.bufferToHex(tree.getRoot()),
+  };
 }
