@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
+import {IStateReceiver} from "./StateSender.sol";
+
 interface IFxChild {
     function onStateReceive(uint256 stateId, bytes calldata _data) external;
 }
@@ -8,8 +10,8 @@ interface IFxChild {
 /**
  * @title StateReceiver
  */
-contract StateReceiver {
-    address fxChild;
+contract StateReceiver is IStateReceiver {
+    address public fxChild;
 
     constructor(address _fxChild) {
         fxChild = _fxChild;
