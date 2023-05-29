@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main,dev/foundry]
+    branches: [main, dev/foundry]
   workflow_dispatch:
 
 jobs:
@@ -22,6 +22,21 @@ jobs:
         run: forge build
       - name: Run tests
         run: forge test -vvv
+  hardhat-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Get node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "yarn"
+      - name: Build
+        run: yarn build
+      - name: Run tests
+        run: yarn test
   coverage:
     runs-on: ubuntu-latest
     steps:
@@ -44,9 +59,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "18.x"
-          cache: "npm"
-      - run: npm ci
-      - run: npm run lint
+          cache: "yarn"
+      - run: yarn
+      - run: yarn lint
   slither:
     runs-on: ubuntu-latest
     steps:
