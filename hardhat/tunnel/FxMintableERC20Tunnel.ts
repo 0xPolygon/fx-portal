@@ -3,59 +3,27 @@ import { Signer } from "ethers";
 import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
 import { expandTo18Decimals } from "../shared/utilities";
-import { getCreate2Address } from "../shared/utilities";
-import { childFixture } from "../shared/fixtures";
+import { ChildFixture, RootFixture, childFixture } from "../shared/fixtures";
 import { FxERC20 } from "../../types/FxERC20";
-import { FxERC20__factory } from "../../types/factories/FxERC20__factory";
-import { FxERC721 } from "../../types/FxERC721";
-import { FxERC1155 } from "../../types/FxERC1155";
-import { FxERC20ChildTunnel } from "../../types/FxERC20ChildTunnel";
-import { FxERC721ChildTunnel } from "../../types/FxERC721ChildTunnel";
-import { FxERC1155ChildTunnel } from "../../types/FxERC1155ChildTunnel";
 import { FxMintableERC20ChildTunnel } from "../../types/FxMintableERC20ChildTunnel";
 import { FxMintableERC20RootTunnel } from "../../types/FxMintableERC20RootTunnel";
 import { rootFixture } from "../shared/fixtures";
-import { FxChildTest } from "../../types/FxChildTest";
-import { FxRoot } from "../../types/FxRoot";
-import { FxERC20RootTunnel } from "../../types/FxERC20RootTunnel";
-import { FxERC721RootTunnel } from "../../types/FxERC721RootTunnel";
-import { FxERC1155RootTunnel } from "../../types/FxERC1155RootTunnel";
-import { StateReceiver } from "../../types/StateReceiver";
-import { StateSender } from "../../types/StateSender";
+import { MockCheckpointManager } from "../../types/MockCheckpointManager";
+import { FxMintableERC20 } from "../../types/FxMintableERC20";
+import { buildPayloadForExit } from "./payload/payload";
 
 chai.use(solidity);
 
 const TOTAL_SUPPLY = expandTo18Decimals(10000);
-const TEST_AMOUNT = expandTo18Decimals(10);
 
-interface ChildFixture {
-  fxChild: FxChildTest;
-  erc20Token: FxERC20;
-  erc20: FxERC20ChildTunnel;
-  erc721Token: FxERC721;
-  mintableERC20Token: FxERC20;
-  erc721: FxERC721ChildTunnel;
-  erc1155Token: FxERC1155;
-  erc1155: FxERC1155ChildTunnel;
-  mintableErc20: FxMintableERC20ChildTunnel;
-  stateReceiver: StateReceiver;
-}
-
-interface RootFixture {
-  fxRoot: FxRoot;
-  erc20: FxERC20RootTunnel;
-  erc721: FxERC721RootTunnel;
-  erc1155: FxERC1155RootTunnel;
-  mintableErc20: FxMintableERC20RootTunnel;
-  stateSender: StateSender;
-}
-
-describe("FxERC20Tunnel", () => {
+describe("FxMintableERC20Tunnel", () => {
   let wallet: Signer;
   let other: Signer;
   let fxERC20: FxERC20;
   let fxMintableERC20ChildTunnel: FxMintableERC20ChildTunnel;
   let fxMintableERC20RootTunnel: FxMintableERC20RootTunnel;
+  let checkpointManager: MockCheckpointManager;
+  let fxMintableERC20: FxMintableERC20;
 
   beforeEach(async () => {
     const signers = await ethers.getSigners();
@@ -64,14 +32,16 @@ describe("FxERC20Tunnel", () => {
     const cFixture: ChildFixture = await childFixture(signers);
     fxERC20 = cFixture.erc20Token;
     fxMintableERC20ChildTunnel = cFixture.mintableErc20;
+    fxMintableERC20 = cFixture.mintableERC20Token;
     const rFixture: RootFixture = await rootFixture(signers, cFixture);
     fxMintableERC20RootTunnel = rFixture.mintableErc20;
+    checkpointManager = rFixture.checkpointManager;
 
     await fxERC20.mint(await wallet.getAddress(), TOTAL_SUPPLY);
   });
 
   it("fxChild, deployToken success", async () => {
-    const uniqueId = 0;
+    const uniqueId = ethers.utils.randomBytes(32);
     let childTokenMap = await fxMintableERC20ChildTunnel.rootToChildToken(
       fxERC20.address
     );
@@ -94,11 +64,10 @@ describe("FxERC20Tunnel", () => {
     childTokenMap = await fxMintableERC20ChildTunnel.rootToChildToken(
       fxERC20.address
     );
-    console.log(childTokenMap);
   });
 
   it("fxChild, deployToken fail - id is already used", async () => {
-    const uniqueId = 0;
+    const uniqueId = ethers.utils.randomBytes(32);
     await fxMintableERC20ChildTunnel.deployChildToken(
       uniqueId,
       "FxMintableRC20 Child Token",
@@ -115,10 +84,68 @@ describe("FxERC20Tunnel", () => {
     ).revertedWith("Create2: Failed on minimal deploy");
   });
 
-  it("fxChild, mintToken fail - not mapped", async () => {
-    const amountToMint = expandTo18Decimals(10);
-    await expect(
-      fxMintableERC20ChildTunnel.mintToken(fxERC20.address, amountToMint)
-    ).to.be.revertedWith("FxMintableERC20ChildTunnel: NO_MAPPED_TOKEN");
+  it("fxChild, withdraw success", async () => {
+    const amount = expandTo18Decimals(10);
+
+    const uniqueId = ethers.utils.randomBytes(32);
+    const deployChildToken = await (
+      await fxMintableERC20ChildTunnel.deployChildToken(
+        uniqueId,
+        "FxMintableERC20",
+        "FM1",
+        18
+      )
+    ).wait();
+    // const childTokenAddress =
+    //   await fxMintableERC20ChildTunnel.computedCreate2Address(
+    //     ethers.utils.keccak256(uniqueId),
+    //     ethers.utils.keccak256(FxMintableERC20__factory.bytecode),
+    //     fxMintableERC20ChildTunnel.address
+    //   );
+    // const rootTokenAddress =
+    // await fxMintableERC20ChildTunnel.computedCreate2Address(
+    //   ethers.utils.keccak256(uniqueId),
+    //   ethers.utils.keccak256(
+    //     await fxMintableERC20ChildTunnel.rootTokenTemplateCodeHash()
+    //   ),
+    //   fxMintableERC20RootTunnel.address
+    // );
+    const rootTokenAddress = deployChildToken.events?.at(0)?.args?.at(0);
+    const childTokenAddress = deployChildToken.events?.at(0)?.args?.at(1);
+
+    const childToken = fxMintableERC20.attach(childTokenAddress);
+    const rootToken = fxERC20.attach(rootTokenAddress);
+
+    await childToken.mintToken(await wallet.getAddress(), amount);
+    expect((await childToken.balanceOf(await wallet.getAddress())).eq(amount));
+
+    const withdrawTx = await fxMintableERC20ChildTunnel.withdraw(
+      childTokenAddress,
+      amount
+    ); // burn
+    expect((await childToken.balanceOf(await wallet.getAddress())).eq(0));
+
+    const { root, burnProof } = await buildPayloadForExit(withdrawTx.hash);
+    expect(
+      await ethers.provider.send("eth_getCode", [rootTokenAddress])
+    ).to.equal("0x"); // root token not deployed yet
+
+    await checkpointManager.submitCheckpoint(
+      500,
+      root,
+      withdrawTx.blockNumber! - 1,
+      withdrawTx.blockNumber!
+    );
+    await expect(fxMintableERC20RootTunnel.receiveMessage(burnProof))
+      .to.emit(fxMintableERC20RootTunnel, "FxWithdrawMintableERC20")
+      .withArgs(
+        rootTokenAddress,
+        childTokenAddress,
+        await wallet.getAddress(),
+        amount
+      );
+
+    expect((await rootToken.balanceOf(await wallet.getAddress())).eq(amount)); // root token deployed
+    expect((await childToken.balanceOf(await wallet.getAddress())).eq(0));
   });
 });

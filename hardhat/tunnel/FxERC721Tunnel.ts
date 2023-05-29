@@ -2,49 +2,16 @@ import chai, { expect } from "chai";
 import { Signer } from "ethers";
 import { ethers } from "hardhat";
 import { solidity } from "ethereum-waffle";
-import { expandTo18Decimals } from "../shared/utilities";
-import { childFixture } from "../shared/fixtures";
-import { FxERC20 } from "../../types/FxERC20";
+import { ChildFixture, RootFixture, childFixture } from "../shared/fixtures";
 import { FxERC721 } from "../../types/FxERC721";
 import { FxERC721__factory } from "../../types/factories/FxERC721__factory";
-import { FxERC1155 } from "../../types/FxERC1155";
-import { FxERC20ChildTunnel } from "../../types/FxERC20ChildTunnel";
 import { FxERC721ChildTunnel } from "../../types/FxERC721ChildTunnel";
-import { FxERC1155ChildTunnel } from "../../types/FxERC1155ChildTunnel";
-import { FxMintableERC20ChildTunnel } from "../../types/FxMintableERC20ChildTunnel";
-import { FxMintableERC20RootTunnel } from "../../types/FxMintableERC20RootTunnel";
 import { rootFixture } from "../shared/fixtures";
-import { FxChildTest } from "../../types/FxChildTest";
-import { FxRoot } from "../../types/FxRoot";
-import { FxERC20RootTunnel } from "../../types/FxERC20RootTunnel";
 import { FxERC721RootTunnel } from "../../types/FxERC721RootTunnel";
-import { FxERC1155RootTunnel } from "../../types/FxERC1155RootTunnel";
-import { StateReceiver } from "../../types/StateReceiver";
-import { StateSender } from "../../types/StateSender";
+import { MockCheckpointManager } from "../../types/MockCheckpointManager";
+import { buildPayloadForExit } from "./payload/payload";
 
 chai.use(solidity);
-
-interface ChildFixture {
-  fxChild: FxChildTest;
-  erc20Token: FxERC20;
-  erc20: FxERC20ChildTunnel;
-  erc721Token: FxERC721;
-  mintableERC20Token: FxERC20;
-  erc721: FxERC721ChildTunnel;
-  erc1155Token: FxERC1155;
-  erc1155: FxERC1155ChildTunnel;
-  mintableErc20: FxMintableERC20ChildTunnel;
-  stateReceiver: StateReceiver;
-}
-
-interface RootFixture {
-  fxRoot: FxRoot;
-  erc20: FxERC20RootTunnel;
-  erc721: FxERC721RootTunnel;
-  erc1155: FxERC1155RootTunnel;
-  mintableErc20: FxMintableERC20RootTunnel;
-  stateSender: StateSender;
-}
 
 describe("FxERC721Tunnel", () => {
   let wallet: Signer;
@@ -52,6 +19,7 @@ describe("FxERC721Tunnel", () => {
   let fxERC721: FxERC721;
   let fxERC721ChildTunnel: FxERC721ChildTunnel;
   let fxERC721RootTunnel: FxERC721RootTunnel;
+  let checkpointManager: MockCheckpointManager;
 
   beforeEach(async () => {
     const signers = await ethers.getSigners();
@@ -62,6 +30,7 @@ describe("FxERC721Tunnel", () => {
     fxERC721ChildTunnel = cFixture.erc721;
     const rFixture: RootFixture = await rootFixture(signers, cFixture);
     fxERC721RootTunnel = rFixture.erc721;
+    checkpointManager = rFixture.checkpointManager;
 
     await fxERC721.mint(await wallet.getAddress(), 0, "0x");
   });
@@ -268,9 +237,12 @@ describe("FxERC721Tunnel", () => {
       ]
     );
 
-    await expect(
-      fxERC721ChildTunnel.withdraw(childFxERC721.address, tokenId, "0x")
-    )
+    const withdrawTx = await fxERC721ChildTunnel.withdraw(
+      childFxERC721.address,
+      tokenId,
+      "0x"
+    );
+    await expect(withdrawTx)
       .to.emit(childFxERC721, "Transfer")
       .withArgs(
         await wallet.getAddress(),
@@ -281,6 +253,16 @@ describe("FxERC721Tunnel", () => {
       .withArgs(messageData);
 
     expect(await childFxERC721.balanceOf(await wallet.getAddress())).to.eq(0);
-    expect(await fxERC721.balanceOf(await wallet.getAddress())).to.eq(0);
+
+    const { burnProof, root } = await buildPayloadForExit(withdrawTx.hash);
+    await checkpointManager.submitCheckpoint(
+      500,
+      root,
+      withdrawTx.blockNumber! - 1,
+      withdrawTx.blockNumber!
+    );
+    await fxERC721RootTunnel.receiveMessage(burnProof); //claim
+
+    expect(await fxERC721.balanceOf(await wallet.getAddress())).to.eq(1);
   });
 });
