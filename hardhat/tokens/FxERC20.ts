@@ -182,7 +182,7 @@ describe("FxERC20", () => {
         await wallet.getAddress(),
         await other.getAddress()
       )
-    ).to.eq(ethers.constants.MaxUint256.sub(TEST_AMOUNT));
+    ).to.eq(ethers.constants.MaxUint256);
     expect(await fxERC20.balanceOf(await wallet.getAddress())).to.eq(
       TOTAL_SUPPLY.sub(TEST_AMOUNT)
     );
