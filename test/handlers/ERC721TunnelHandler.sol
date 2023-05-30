@@ -154,7 +154,7 @@ contract ERC721Handler is CommonBase, StdCheats, StdUtils {
         for (uint i; i < num; i++) {
             erc721RootTunnel.receiveMessage(pendingWithdrawalProofs[i]);
 
-            (, address childToken, address who, uint256 tokenId) = abi.decode(
+            (, address childToken, address who, ) = abi.decode(
                 pendingWithdrawalProofs[i],
                 (address, address, address, uint256)
             );
