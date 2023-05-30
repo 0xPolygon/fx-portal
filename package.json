@@ -9,7 +9,9 @@
     "prettier:check": "prettier --check \"{script,contracts,test,hardhat}/**/*.{sol,ts}\"",
     "prettier:write": "prettier --write \"{script,contracts,test,hardhat}/**/*.{sol,ts}\"",
     "build": "hardhat compile",
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "test:forge": "forge test -vvv",
+    "coverage": "./coverage.sh"
   },
   "repository": {
     "type": "git",
