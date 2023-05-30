@@ -57,7 +57,7 @@ jobs:
           node-version: "16.x"
           cache: "yarn"
       - name: Setup
-        uses: yarn
+        run: yarn
       - name: Get coverage
         run: yarn coverage
   lint:
