@@ -57,7 +57,7 @@ jobs:
           node-version: "16.x"
           cache: "yarn"
       - name: Setup
-        run: yarn && apt-get install lcov
+        run: yarn && sudo apt-get install lcov
       - name: Get coverage
         run: yarn coverage
   lint:
