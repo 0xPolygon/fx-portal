@@ -7,34 +7,12 @@ import "hardhat-contract-sizer";
 import "hardhat-gas-reporter";
 
 import { HardhatUserConfig } from "hardhat/types";
-import { task } from "hardhat/config";
 
-// import * as dotenv from 'dotenv';
-
-// dotenv.config();
-
-// const secret: string = process.env.PRIVATE_KEY as string;
-// const infraKey = process.env.INFURA_API_KEY
-// const etherscanKey: string = process.env.ETHERSCAN_API_KEY as string;
-
-let accounts: any = []
+let accounts: any = [];
 
 if (process.env.PRIVATE_KEY) {
-  accounts = [`0x${process.env.PRIVATE_KEY}`, ...accounts]
+  accounts = [`0x${process.env.PRIVATE_KEY}`, ...accounts];
 }
-
-// This is a sample Hardhat task. To learn how to create your own go to
-// https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
-  const accounts = await hre.ethers.getSigners();
-
-  for (const account of accounts) {
-    console.log(account.address);
-  }
-});
-
-// You need to export an object to set up your config
-// Go to https://hardhat.org/config/ to learn more
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -44,34 +22,37 @@ export default {
   networks: {
     hardhat: {
       // accounts: [secret],
+      allowUnlimitedContractSize: true,
+      gas: 120000000000000,
+      blockGasLimit: 0x1fffffffffffff,
     },
     mainnet: {
-      url: process.env.MAINNET_RPC || 'https://main-light.eth.linkpool.io',
-      accounts
+      url: process.env.MAINNET_RPC || "https://main-light.eth.linkpool.io",
+      accounts,
     },
     goerli: {
-      url: process.env.GOERLI_RPC || 'https://goerli-light.eth.linkpool.io',
-      accounts
+      url: process.env.GOERLI_RPC || "https://goerli-light.eth.linkpool.io",
+      accounts,
     },
     polygon: {
-      url: process.env.POLYGON_RPC || 'https://polygon-rpc.com',
-      accounts
+      url: process.env.POLYGON_RPC || "https://polygon-rpc.com",
+      accounts,
     },
     mumbai: {
-      url: process.env.MUMBAI_RPC || 'https://rpc-mumbai.maticvigil.com',
-      accounts
-    }
+      url: process.env.MUMBAI_RPC || "https://rpc-mumbai.maticvigil.com",
+      accounts,
+    },
   },
   solidity: {
-    version: '0.8.17',
+    version: "0.8.17",
     settings: {
       optimizer: {
-        enabled: false
-      }
-    }
+        enabled: true,
+      },
+    },
   },
   paths: {
-    tests: 'hardhat'
+    tests: "hardhat",
   },
   typechain: {
     outDir: "types/",
@@ -83,7 +64,7 @@ export default {
     disambiguatePaths: false,
   },
   etherscan: {
-    apiKey: process.env.ETHERSCAN_API_KEY
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   gasReporter: {
     currency: "USD",

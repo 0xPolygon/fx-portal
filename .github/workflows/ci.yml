@@ -51,8 +51,15 @@ jobs:
           version: nightly
       - name: Build
         run: forge build
+      - name: Get node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+          cache: "yarn"
+      - name: Setup
+        run: yarn && sudo apt-get install lcov
       - name: Get coverage
-        run: forge coverage
+        run: yarn coverage
   lint:
     runs-on: ubuntu-latest
     steps:
