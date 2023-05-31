@@ -153,16 +153,19 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         // mint remaining amount for this address
         IFxERC1155 nft = IFxERC1155(rootToken);
         uint256 len = ids.length;
+        uint256[] memory toMintAmounts = new uint256[](len);
+        bool toMint;
         for (uint256 i; i < len; ) {
             uint256 balance = nft.balanceOf(address(this), ids[i]);
             if (balance < amounts[i]) {
-                nft.mint(address(this), ids[i], amounts[i] - balance, "");
+                toMintAmounts[i] = amounts[i] - balance;
+                toMint = true;
             }
             unchecked {
                 ++i;
             }
         }
-
+        if (toMint) nft.mintBatch(address(this), ids, toMintAmounts, "");
         nft.safeBatchTransferFrom(address(this), user, ids, amounts, data);
         emit FxWithdrawBatchMintableERC1155(rootToken, childToken, user, ids, amounts);
     }
