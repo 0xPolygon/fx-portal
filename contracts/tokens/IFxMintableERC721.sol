@@ -9,18 +9,14 @@ interface IFxMintableERC721 is IERC721 {
     function connectedToken() external returns (address);
 
     function initialize(
-        address fxManager,
-        address connectedToken,
+        address _fxManager,
+        address _connectedToken,
         string calldata name,
         string calldata symbol,
         address minter
     ) external;
 
-    function mintToken(
-        address user,
-        uint256 tokenId,
-        bytes calldata _data
-    ) external;
+    function mintToken(address user, uint256 tokenId, bytes calldata _data) external;
 
     function burn(uint256 tokenId) external;
 }

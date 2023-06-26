@@ -22,34 +22,26 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
     // token template
     address public immutable tokenTemplate;
 
+    // slither-disable-next-line missing-zero-check
     constructor(address _fxChild, address _tokenTemplate) FxBaseChildTunnel(_fxChild) {
         tokenTemplate = _tokenTemplate;
         require(_isContract(_tokenTemplate), "Token template is not contract");
     }
 
     function onERC721Received(
-        address, /* operator */
-        address, /* from */
-        uint256, /* tokenId */
+        address /* operator */,
+        address /* from */,
+        uint256 /* tokenId */,
         bytes calldata /* data */
     ) external pure override returns (bytes4) {
         return this.onERC721Received.selector;
     }
 
-    function withdraw(
-        address childToken,
-        uint256 tokenId,
-        bytes memory data
-    ) external {
+    function withdraw(address childToken, uint256 tokenId, bytes memory data) external {
         _withdraw(childToken, msg.sender, tokenId, data);
     }
 
-    function withdrawTo(
-        address childToken,
-        address receiver,
-        uint256 tokenId,
-        bytes memory data
-    ) external {
+    function withdrawTo(address childToken, address receiver, uint256 tokenId, bytes memory data) external {
         _withdraw(childToken, receiver, tokenId, data);
     }
 
@@ -58,7 +50,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
     //
 
     function _processMessageFromRoot(
-        uint256, /* stateId */
+        uint256 /* stateId */,
         address sender,
         bytes memory data
     ) internal override validateSender(sender) {
@@ -86,6 +78,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
         // deploy new child token
         bytes32 salt = keccak256(abi.encodePacked(rootToken));
         childToken = createClone(salt, tokenTemplate);
+        // slither-disable-next-line reentrancy-no-eth
         IFxERC721(childToken).initialize(
             address(this),
             rootToken,
@@ -113,12 +106,7 @@ contract FxERC721ChildTunnel is FxBaseChildTunnel, Create2, IERC721Receiver {
         childTokenContract.mint(to, tokenId, depositData);
     }
 
-    function _withdraw(
-        address childToken,
-        address receiver,
-        uint256 tokenId,
-        bytes memory data
-    ) internal {
+    function _withdraw(address childToken, address receiver, uint256 tokenId, bytes memory data) internal {
         IFxERC721 childTokenContract = IFxERC721(childToken);
         // child token contract will have root token
         address rootToken = childTokenContract.connectedToken();

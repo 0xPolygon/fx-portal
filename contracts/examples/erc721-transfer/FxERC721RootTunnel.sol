@@ -41,9 +41,9 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
     }
 
     function onERC721Received(
-        address, /* operator */
-        address, /* from */
-        uint256, /* tokenId */
+        address /* operator */,
+        address /* from */,
+        uint256 /* tokenId */,
         bytes calldata /* data */
     ) external pure override returns (bytes4) {
         return this.onERC721Received.selector;
@@ -64,6 +64,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
 
         // MAP_TOKEN, encode(rootToken, name, symbol)
         bytes memory message = abi.encode(MAP_TOKEN, abi.encode(rootToken, name, symbol));
+        // slither-disable-next-line reentrancy-no-eth
         _sendMessageToChild(message);
 
         // compute child token address before deployment using create2
@@ -75,12 +76,7 @@ contract FxERC721RootTunnel is FxBaseRootTunnel, Create2, IERC721Receiver {
         emit TokenMappedERC721(rootToken, childToken);
     }
 
-    function deposit(
-        address rootToken,
-        address user,
-        uint256 tokenId,
-        bytes memory data
-    ) public {
+    function deposit(address rootToken, address user, uint256 tokenId, bytes memory data) public {
         // map token if not mapped
         if (rootToChildTokens[rootToken] == address(0x0)) {
             mapToken(rootToken);

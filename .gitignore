@@ -22,6 +22,8 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
+*lcov.info
+coverage.json
 
 # nyc test coverage
 .nyc_output
@@ -110,3 +112,15 @@ node_modules
 cache
 artifacts
 internal
+
+# Foundry files
+forge-cache/
+out/
+# Ignores development broadcast logs
+!/broadcast
+/broadcast/*
+/broadcast/*/31337/
+
+lcov.info
+
+types/

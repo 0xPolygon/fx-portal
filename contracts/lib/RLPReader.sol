@@ -312,11 +312,7 @@ library RLPReader {
      * @param dest Pointer to destination
      * @param len Amount of memory to copy from the source
      */
-    function copy(
-        uint256 src,
-        uint256 dest,
-        uint256 len
-    ) private pure {
+    function copy(uint256 src, uint256 dest, uint256 len) private pure {
         if (len == 0) return;
 
         // copy as many word sizes as possible
@@ -332,7 +328,7 @@ library RLPReader {
         if (len == 0) return;
 
         // left over bytes. Mask is used to remove unwanted bytes from the word
-        uint256 mask = 256**(WORD_SIZE - len) - 1;
+        uint256 mask = 256 ** (WORD_SIZE - len) - 1;
 
         assembly {
             let srcpart := and(mload(src), not(mask)) // zero out src

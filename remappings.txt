@@ -1,0 +1,6 @@
+@mock/=test/mock/
+@openzeppelin/=lib/openzeppelin-contracts/
+@utils/=test/utils/
+ds-test/=lib/forge-std/lib/ds-test/src/
+forge-std/=lib/forge-std/src/
+openzeppelin-contracts/=lib/openzeppelin-contracts/

@@ -9,8 +9,8 @@ interface IFxMintableERC20 is IERC20Metadata {
     function connectedToken() external returns (address);
 
     function initialize(
-        address fxManager,
-        address connectedToken,
+        address _fxManager,
+        address _connectedToken,
         string memory _name,
         string memory _symbol,
         uint8 _decimals,

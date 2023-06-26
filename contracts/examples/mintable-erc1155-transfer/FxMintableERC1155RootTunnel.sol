@@ -45,6 +45,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
     mapping(address => address) public rootToChildTokens;
     address public immutable rootTokenTemplate;
 
+    // slither-disable-next-line missing-zero-check
     constructor(
         address _checkpointManager,
         address _fxRoot,
@@ -53,13 +54,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         rootTokenTemplate = _rootTokenTemplate;
     }
 
-    function deposit(
-        address rootToken,
-        address user,
-        uint256 id,
-        uint256 amount,
-        bytes calldata data
-    ) public {
+    function deposit(address rootToken, address user, uint256 id, uint256 amount, bytes calldata data) public {
         require(rootToChildTokens[rootToken] != address(0x0), "FxMintableERC1155RootTunnel: NO_MAPPING_FOUND");
 
         // transfer from depositor to this contract
@@ -123,10 +118,19 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         ) = abi.decode(syncData, (address, address, address, uint256, uint256, bytes, string));
         // if root token is not available, create it
         if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
-            _deployRootToken(rootToken, metadata);
+            _deployRootToken(childToken, metadata);
         }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
-        IFxERC1155(rootToken).safeTransferFrom(address(this), user, id, amount, data);
+
+        // check if current balance for token is less than amount,
+        // mint remaining amount for this address
+        IFxERC1155 nft = IFxERC1155(rootToken);
+        uint256 balance = nft.balanceOf(address(this), id);
+        if (balance < amount) {
+            nft.mint(address(this), id, amount - balance, "");
+        }
+
+        nft.safeTransferFrom(address(this), user, id, amount, data);
         emit FxWithdrawMintableERC1155(rootToken, childToken, user, id, amount);
     }
 
@@ -142,10 +146,27 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         ) = abi.decode(syncData, (address, address, address, uint256[], uint256[], bytes, string));
         // if root token is not available, create it
         if (!Address.isContract(rootToken) && rootToChildTokens[rootToken] == address(0x0)) {
-            _deployRootToken(rootToken, metadata);
+            _deployRootToken(childToken, metadata);
         }
         require(rootToChildTokens[rootToken] == childToken, "FxMintableERC1155RootTunnel: INVALID_MAPPING_ON_EXIT");
-        IFxERC1155(rootToken).safeBatchTransferFrom(address(this), user, ids, amounts, data);
+        // check if current balance for token is less than amount,
+        // mint remaining amount for this address
+        IFxERC1155 nft = IFxERC1155(rootToken);
+        uint256 len = ids.length;
+        uint256[] memory toMintAmounts = new uint256[](len);
+        bool toMint;
+        for (uint256 i; i < len; ) {
+            uint256 balance = nft.balanceOf(address(this), ids[i]);
+            if (balance < amounts[i]) {
+                toMintAmounts[i] = amounts[i] - balance;
+                toMint = true;
+            }
+            unchecked {
+                ++i;
+            }
+        }
+        if (toMint) nft.mintBatch(address(this), ids, toMintAmounts, "");
+        nft.safeBatchTransferFrom(address(this), user, ids, amounts, data);
         emit FxWithdrawBatchMintableERC1155(rootToken, childToken, user, ids, amounts);
     }
 
@@ -153,6 +174,7 @@ contract FxMintableERC1155RootTunnel is FxBaseRootTunnel, Create2, ERC1155Holder
         // deploy new root token
         bytes32 salt = keccak256(abi.encodePacked(childToken));
         address rootToken = createClone(salt, rootTokenTemplate);
+        // slither-disable-next-line reentrancy-benign
         IFxERC1155(rootToken).initialize(address(this), childToken, uri);
 
         // add into mapped tokens
