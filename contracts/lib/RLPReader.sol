@@ -1,8 +1,10 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: Apache-2.0
+
 /*
  * @author Hamdi Allam hamdi.allam97@gmail.com
  * Please reach out with any questions or concerns
  */
+
 pragma solidity ^0.8.0;
 
 library RLPReader {
