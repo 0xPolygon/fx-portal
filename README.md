@@ -26,8 +26,8 @@ While Fx-portal focuses on permissionless-ness and flexibility, a developer migh
 
 **Can I build my bridge?**
 
-Yes. You can check docs here: https://wiki.polygon.technology/docs/develop/l1-l2-communication/ethereum-to-matic/
-https://wiki.polygon.technology/docs/develop/l1-l2-communication/matic-to-ethereum/
+Yes. You can check docs here: https://wiki.polygon.technology/docs/pos/design/bridge/l1-l2-communication/ethereum-to-matic/
+https://wiki.polygon.technology/docs/pos/design/bridge/l1-l2-communication/matic-to-ethereum/
 
 ### What are FxChild and FxRoot?
 
