@@ -7,13 +7,28 @@ import "hardhat-contract-sizer";
 import "hardhat-gas-reporter";
 
 import { HardhatUserConfig } from "hardhat/types";
+import { task } from "hardhat/config";
 
 const importToml = require("import-toml");
 const foundryConfig = importToml.sync("foundry.toml");
 
-if (process.env.PRIVATE_KEY) {
-  accounts = [`0x${process.env.PRIVATE_KEY}`, ...accounts];
-}
+const accounts = process.env.PRIVATE_KEY
+  ? [`0x${process.env.PRIVATE_KEY}`]
+  : [];
+
+task("exit-proof", "Generates exit proof for the given burn transaction hash")
+  .addParam("tx", "burn transaction hash")
+  .addOptionalParam(
+    "sig",
+    "log event hex signature (defaults to 0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036 for `MessageSent(bytes)`)"
+  )
+  .setAction(async (args, hre) => {
+    const { buildPayloadForExit } = require("./hardhat/tunnel/payload/payload");
+    console.log(
+      (await buildPayloadForExit(args.tx, hre.ethers.provider, args.sig))
+        .burnProof
+    );
+  });
 
 /**
  * @type import('hardhat/config').HardhatUserConfig

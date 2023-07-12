@@ -132,12 +132,13 @@ export function getBlockHeader(block: IBaseBlock) {
 
 export async function buildPayloadForExit(
   burnTxHash: string,
+  provider = ethers.provider,
   logEventSig = "0x8c5261668696ce22758910d05bab8f186d6eb247ceac2af2e82c7dc17669b036",
   isFast = false
 ) {
   const requestConcurrency = 0;
-  const receipt = await ethers.provider.getTransactionReceipt(burnTxHash);
-  const block = await ethers.provider.send("eth_getBlockByNumber", [
+  const receipt = await provider.getTransactionReceipt(burnTxHash);
+  const block = await provider.send("eth_getBlockByNumber", [
     ethers.utils.hexValue(receipt.blockNumber),
     true,
   ]);
@@ -150,12 +151,12 @@ export async function buildPayloadForExit(
   const headers = await getHeaders(
     rootBlockInfo.start,
     rootBlockInfo.end,
-    ethers.provider
+    provider
   );
   const tree = new MerkleTree(headers);
 
   const fullBlockHeader = getBlockHeader(
-    (await ethers.provider.send("eth_getBlockByNumber", [
+    (await provider.send("eth_getBlockByNumber", [
       ethers.utils.hexValue(block.number),
       true,
     ])) as unknown as IBaseBlock
@@ -170,7 +171,7 @@ export async function buildPayloadForExit(
     requestConcurrency,
     await Promise.all(
       block.transactions.map((tx: any) =>
-        ethers.provider.getTransactionReceipt(tx.hash)
+        provider.getTransactionReceipt(tx.hash)
       )
     )
   );
