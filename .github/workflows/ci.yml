@@ -85,3 +85,5 @@ jobs:
         run: forge build
       - name: Slither
         uses: crytic/slither-action@v0.3.0
+        with:
+          slither-version: "0.9.3"
