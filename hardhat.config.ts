@@ -8,7 +8,8 @@ import "hardhat-gas-reporter";
 
 import { HardhatUserConfig } from "hardhat/types";
 
-let accounts: any = [];
+const importToml = require("import-toml");
+const foundryConfig = importToml.sync("foundry.toml");
 
 if (process.env.PRIVATE_KEY) {
   accounts = [`0x${process.env.PRIVATE_KEY}`, ...accounts];
@@ -44,10 +45,15 @@ export default {
     },
   },
   solidity: {
-    version: "0.8.17",
+    version: foundryConfig.profile.default.solc_version,
     settings: {
+      viaIR: foundryConfig.profile.default.via_ir,
       optimizer: {
         enabled: true,
+        runs: foundryConfig.profile.default.optimizer_runs,
+      },
+      metadata: {
+        bytecodeHash: "none",
       },
     },
   },
