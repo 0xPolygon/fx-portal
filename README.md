@@ -1,37 +1,57 @@
-# fx-portal(Flexible portal)
+# FX-Portal (Flexible Portal)
 
-FxPortal for Polygon (prev Matic) Chain. No mapping. Seamless communication with Ethereum Network.
+FxPortal for Polygon (prev Matic) Chain. No mappings. Seamless communication with Ethereum Network.
 
 ### Audits
 
 - [Halborn](audits/Polygon_FX_Portal_Smart_Contract_Security_Audit_Halborn_v1_0.pdf)
 - [ChainSecurity](audits/ChainSecurity_Polygon_Fx_Portal_audit.pdf)
 
-### What is Fx bridge (fx-portal)?
+### Contents
+
+- [What is FX-Portal](#what-is-fx-portal)
+  - [Some usecases](#some-usecases-of-fx-portal)
+  - [What about POS-Portal](#what-about-pos-portal)
+  - [Can I Build My Own Custom Bridge](#can-i-build-my-own-custom-bridge)
+- [What Can I Build With FX-Portal](#what-can-i-build-with-fx-portal)
+- [What are fxChild and fxRoot](#what-are-fxchild-and-fxroot)
+- [Deployment Addresses](#deployment-addresses)
+- [Development](#development)
+- [Proof Generation](#proof-generation)
+
+### What is FX-Portal?
 
 **A powerful yet simple implementation of Polygon's [state sync](https://wiki.polygon.technology/docs/category/state-sync/) mechanism. (The Polygon [POS-Portal bridge](https://github.com/maticnetwork/pos-portal/) is also based on it, but relies on a centralized party mapping tokens on one chain to their contract on the other.) There are examples of how to use the bridge in the `contracts/examples` directory. You can use these examples to build your own implementations or own custom bridge.**
 
-In short, it's Meta bridge. This bridge allows any state-syncs without mapping.
+In short, this bridge allows arbitrary message bridging without mapping, with built-in support for a number of token standards.
 
-#### Some use-cases of Fx-portal
+In more detail, FX-Portal makes use of a message passing mechanism built into the Polygon POS chain, leveraging it to pass messages from one chain to another. Using a mechanism for generating deterministic token addresses, this can be used to create asset bridges without the need for a centralized party documenting the relationship between assets on the two chains (commonly referred to as a 'mapping' here).
+
+#### Some usecases of FX-Portal
 
 - [ERC20 token tranfer from Ethereum to Polygon POS without mapping request](https://github.com/0xPolygon/fx-portal/tree/main/contracts/examples/erc20-transfer)
 - [Lazy minting of ERC20 tokens on Polygon POS](https://github.com/0xPolygon/fx-portal/tree/main/contracts/examples/mintable-erc20-transfer)
 - [State Transfer between Ethereum mainnet and Polygon POS](https://github.com/0xPolygon/fx-portal/tree/main/contracts/examples/state-transfer)
 
-**What about [POS portal](https://github.com/maticnetwork/pos-portal/)?**
+#### What about [POS-Portal](https://github.com/maticnetwork/pos-portal/)?
 
-PoS Portal is another bridge, but it works only for few ERC standards and requires mappings. It is more developer-friendly in some ways, and allows customization without much headache.
+POS-Portal is another bridge, but it works only for few ERC standards and requires mappings. It is more developer-friendly in some ways, and allows customization without much headache.
 
-While FX-Portal focuses on permissionlessness and flexibility, a developer might have to write more code than PoS Portal. On the other hand, FX-Portal requires no mapping, meaning that there is no need to rely on an authorized party to submit the mapping with FX-Portal.
+While FX-Portal focuses on permissionlessness and flexibility, a developer might have to write more code than POS-Portal. On the other hand, FX-Portal requires no mapping, meaning that there is no need to rely on an authorized party to submit the mapping with FX-Portal.
 
-**Can I build my own custom bridge?**
+#### Can I build my own custom bridge?
 
 Yes. You can check docs here: https://wiki.polygon.technology/docs/pos/design/bridge/l1-l2-communication/fx-portal/
 
+### What can I build with FX-Portal?
+
+- Arbitrary state bridge (examples/state-transfer)
+- Normal ERC20 bridge (examples/erc2-transfer)
+- ERC20 token generator bridge (example/mintable-erc20-transfer)
+
 ### What are FxChild and FxRoot?
 
-`FxChild` (`FxChild.sol`) and `FxRoot` (`FxRoot.sol`) are the main contracts on which the bridge works. It calls and passes data to user-defined methods on another chain without needing a mapping.
+`FxChild` (`FxChild.sol`) and `FxRoot` (`FxRoot.sol`) are the main contracts on which the bridge works. It calls and passes data to user-defined methods on another chain without needing a mapping. You can deploy your own `FxChild` and `FxRoot`, but there is no need. If you pass the data to the deployed instances of `FxChild` or `FxRoot`, the clients will pick up the data and pass it to the other chain.
 
 ### Deployment Addresses
 
@@ -48,14 +68,6 @@ Yes. You can check docs here: https://wiki.polygon.technology/docs/pos/design/br
 | :------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------- |
 | [FxRoot (Ethereum Mainnet)](https://etherscan.io/address/0xfe5e5d361b2ad62c541bab87c45a0b9b018389a2#code)                        | `0xfe5e5D361b2ad62c541bAb87C45a0B9B018389a2` |
 | [FxChild (Matic Mainnnet)](https://explorer-mainnet.maticvigil.com/address/0x8397259c983751DAf40400790063935a11afa28a/contracts) | `0x8397259c983751DAf40400790063935a11afa28a` |
-
-You can deploy your own `FxChild` and `FxRoot`, but there is no need.
-
-### What can I build with FX-Portal?
-
-- Arbitrary state bridge (examples/state-transfer)
-- Normal ERC20 bridge (examples/erc2-transfer)
-- ERC20 token generator bridge (example/mintable-erc20-transfer)
 
 ### Development
 
