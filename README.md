@@ -1,6 +1,6 @@
 # fx-portal(Flexible portal)
 
-FxPortal for Polygon(prev Matic)Chain. No mapping. Seamless communication with Ethereum Network.
+FxPortal for Polygon (prev Matic) Chain. No mapping. Seamless communication with Ethereum Network.
 
 ### Audits
 
@@ -9,7 +9,7 @@ FxPortal for Polygon(prev Matic)Chain. No mapping. Seamless communication with E
 
 ### What is Fx bridge (fx-portal)?
 
-**It is a powerful yet simple implementation Polygon [state sync](https://docs.matic.network/docs/contribute/state-sync) mechanism. Polygon PoS bridge is based on it. The code in the `examples` folder are examples of the usage of this methodology. You can use these examples to build your own implementations or own custom bridge.**
+**A powerful yet simple implementation of Polygon's [state sync](https://wiki.polygon.technology/docs/category/state-sync/) mechanism. (The Polygon [POS-Portal bridge](https://github.com/maticnetwork/pos-portal/) is also based on it, but relies on a centralized party mapping tokens on one chain to their contract on the other.) There are examples of how to use the bridge in the `contracts/examples` directory. You can use these examples to build your own implementations or own custom bridge.**
 
 In short, it's Meta bridge. This bridge allows any state-syncs without mapping.
 
@@ -19,19 +19,21 @@ In short, it's Meta bridge. This bridge allows any state-syncs without mapping.
 - [Lazy minting of ERC20 tokens on Polygon POS](https://github.com/0xPolygon/fx-portal/tree/main/contracts/examples/mintable-erc20-transfer)
 - [State Transfer between Ethereum mainnet and Polygon POS](https://github.com/0xPolygon/fx-portal/tree/main/contracts/examples/state-transfer)
 
-**What about [PoS portal](https://docs.matic.network/docs/develop/ethereum-matic/pos/getting-started)?**
+**What about [POS portal](https://github.com/maticnetwork/pos-portal/)?**
 
-PoS Portal is another bridge, but it works only for few ERC standards and requires mappings. It is more developer-friendly, allows customization without much headache.
+PoS Portal is another bridge, but it works only for few ERC standards and requires mappings. It is more developer-friendly in some ways, and allows customization without much headache.
 
-While Fx-portal focuses on permissionless-ness and flexibility, a developer might have to write more code but more customizable than PoS Portal. It requires no mapping.
+While FX-Portal focuses on permissionlessness and flexibility, a developer might have to write more code than PoS Portal. On the other hand, FX-Portal requires no mapping, meaning that there is no need to rely on an authorized party to submit the mapping with FX-Portal.
 
-**Can I build my bridge?**
+**Can I build my own custom bridge?**
 
 Yes. You can check docs here: https://wiki.polygon.technology/docs/pos/design/bridge/l1-l2-communication/fx-portal/
 
 ### What are FxChild and FxRoot?
 
-`FxChild` (FxChild.sol) and `FxRoot` (FxRoot.sol) are main contracts on which mapping-less bridge works. It calls and passes data to user-defined methods on another chain without mapping.
+`FxChild` (`FxChild.sol`) and `FxRoot` (`FxRoot.sol`) are the main contracts on which the bridge works. It calls and passes data to user-defined methods on another chain without needing a mapping.
+
+### Deployment Addresses
 
 **Mumbai**
 
@@ -47,9 +49,9 @@ Yes. You can check docs here: https://wiki.polygon.technology/docs/pos/design/br
 | [FxRoot (Ethereum Mainnet)](https://etherscan.io/address/0xfe5e5d361b2ad62c541bab87c45a0b9b018389a2#code)                        | `0xfe5e5D361b2ad62c541bAb87C45a0B9B018389a2` |
 | [FxChild (Matic Mainnnet)](https://explorer-mainnet.maticvigil.com/address/0x8397259c983751DAf40400790063935a11afa28a/contracts) | `0x8397259c983751DAf40400790063935a11afa28a` |
 
-You can deploy your own `FxChild` and `FxRoot`, but no need. Except you want to have some fun and have extra ETH to throw away.
+You can deploy your own `FxChild` and `FxRoot`, but there is no need.
 
-### What can I build with it?
+### What can I build with FX-Portal?
 
 - Arbitrary state bridge (examples/state-transfer)
 - Normal ERC20 bridge (examples/erc2-transfer)
@@ -57,21 +59,23 @@ You can deploy your own `FxChild` and `FxRoot`, but no need. Except you want to 
 
 ### Development
 
-This project can be compiled and tested with Hardhat and foundry. Hardhat Unit tests are located in [/hardhat](/hardhat) and Foundry Unit + Invariant tests can be found in the [/test](/test) directory.
+This project can be compiled and tested with Hardhat and Foundry. Hardhat unit tests are located in [/hardhat](/hardhat) and Foundry unit + invariant tests can be found in the [/test](/test) directory.
 
-- Setup: `yarn install` or `forge install`
-- Compile: `yarn build` or `forge build`
-- Test: `yarn test` or `forge test -vvv`
+- Setup: `yarn install` and/or `forge install`
+- Compile: `yarn build` and/or `forge build`
+- Test: `yarn test` and/or `forge test -vvv`
 - Coverage: `yarn coverage`
 - Lint: `yarn lint`, `yarn prettier:write`
 
 #### Proof Generation
 
+A common question is how to generate proofs for the bridge. We'll explain what that means, and then list solutions.
+
 To withdraw tokens on the root chain, first we call the relevant `withdraw()` method the child tunnel contract (which burn the respective tokens on child); and we use this transaction hash to generate proof of inclusion which acts as the argument to receiveMessage() in the respective root tunnel contract. Please see [here](https://wiki.polygon.technology/docs/pos/design/bridge/l1-l2-communication/fx-portal/#withdraw-tokens-on-the-root-chain).
 
 To generate the proof, you can either use the [proof generation API](https://proof-generator.polygon.technology/api/v1/matic/exit-payload/%7BburnTxHash%7D?eventSignature=%7BeventSignature%7D) hosted by Polygon or you can also spin up your own proof generation API by following the instructions [here](https://github.com/maticnetwork/proof-generation-api).
 
-The test suite also have replicates proof generation (located at [hardhat/tunnel/payload](hardhat/tunnel/payload)), the following _hardhat task_ can help generating the proof for custom chains.
+The test suite also replicates proof generation (located at [hardhat/tunnel/payload](hardhat/tunnel/payload)), the following _hardhat task_ can help generating the proof for custom chains.
 
 **Usage**: `npx hardhat exit-proof --help`
 
