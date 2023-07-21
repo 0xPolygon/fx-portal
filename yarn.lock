@@ -539,6 +539,11 @@
     "@ethersproject/properties" "^5.7.0"
     "@ethersproject/strings" "^5.7.0"
 
+"@iarna/toml@^2.2.5":
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"
+  integrity sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==
+
 "@jridgewell/resolve-uri@^3.0.3":
   version "3.1.1"
   resolved "https://registry.yarnpkg.com/@jridgewell/resolve-uri/-/resolve-uri-3.1.1.tgz#c08679063f279615a3326583ba3a90d1d82cc721"
@@ -5320,6 +5325,13 @@ import-fresh@^3.2.1:
   dependencies:
     parent-module "^1.0.0"
     resolve-from "^4.0.0"
+
+import-toml@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/import-toml/-/import-toml-1.0.0.tgz#e5057c3ae694cc98cc9bf4c099222c20480765fb"
+  integrity sha512-TkYSG1Rs9GiKk+hE/+yzugkmB6RY6llF2BgfxjLMZEg1QV36WUxrqnGWzb+ZdU61v5Hn3UWk7ePADdymFERpvA==
+  dependencies:
+    "@iarna/toml" "^2.2.5"
 
 imul@^1.0.0:
   version "1.0.1"
